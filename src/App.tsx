@@ -1,12 +1,15 @@
 import { useState } from 'react'
+import Header from './components/Header'
+import RegistroForm from './components/RegistroForm';
 
 function App() {
 
   return (
     <>
-      <p>holi sofi</p>
+      <Header/>
+      <RegistroForm/>
     </>
   )
 }
 
-export default App
+export default App;
