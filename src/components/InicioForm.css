@@ -1,11 +1,13 @@
-.registro-container {
+.login-container {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding-top: 6.5rem;
   min-height: 100vh;
+  box-sizing: border-box;
 }
 
-.registro-card {
+.login-card {
   background-color: var(--bg-cream);
   width: 100%;
   max-width: 30rem;
@@ -14,13 +16,13 @@
   box-shadow: 0 0.625rem 1.5625rem var(--shadow-color);
 }
 
-.registro-title {
+.login-title {
   font-size: 2rem;
   color: var(--text-dark);
   margin: 0 0 0.5rem 0;
 }
 
-.registro-subtitle {
+.login-subtitle {
   font-size: 1rem;
   color: var(--text-muted);
   margin: 0 0 1.5rem 0;
@@ -28,11 +30,11 @@
 
 .divider {
   border: none;
-  border-top: 0.0625rem solid var(--border-light);
+  border-top: 1px solid var(--border-light);
   margin-bottom: 2rem;
 }
 
-.registro-form {
+.login-form {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -50,8 +52,7 @@
   color: var(--text-light);
 }
 
-.form-group input,
-.form-group select {
+.form-group input {
   width: 100%;
   padding: 1rem 1.25rem;
   background-color: var(--input-bg);
@@ -61,25 +62,29 @@
   color: var(--text-main);
   outline: none;
   transition: background-color 0.2s ease;
-  box-sizing: border-box; /* FIJA EL ANCHO: Hace que el padding no estire el select de más */
 }
 
 .form-group input::placeholder {
   color: var(--text-light);
 }
 
-.form-group input:focus,
-.form-group select:focus {
+.form-group input:focus {
   background-color: var(--input-focus-bg);
 }
 
-/* For the select styling */
-.form-group select {
-  appearance: none;
-  cursor: pointer;
+.forgot-password {
+  text-align: right;
+  margin-top: 0.25rem;
 }
 
-.btn-submit {
+.forgot-password a {
+  font-size: 0.875rem;
+  color: var(--green-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.btn-login-submit {
   width: 100%;
   padding: 1.125rem;
   background-color: var(--green-primary);
@@ -93,29 +98,52 @@
   transition: background-color 0.2s ease;
 }
 
-.btn-submit:hover {
+.btn-login-submit:hover {
   background-color: var(--green-primary-hover);
 }
 
-.registro-footer {
-  margin-top: 2rem;
+.login-footer-divider {
+  position: relative;
   text-align: center;
+  margin: 2rem 0;
 }
 
-.login-link {
+.footer-line {
+  border: none;
+  border-top: 1px solid var(--border-light);
+}
+
+.footer-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--bg-cream);
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-light);
+}
+
+.btn-register-outline {
+  width: 100%;
+  padding: 1.125rem;
+  background-color: transparent;
   color: var(--green-primary);
-  text-decoration: none;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  transition: opacity 0.2s ease;
+  border: 1px solid var(--green-primary);
+  border-radius: 6.25rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.login-link:hover {
+.btn-register-outline:hover {
+  background-color: var(--bg-cream);
   opacity: 0.8;
 }
 
 @media (max-width: 30rem) {
-  .registro-card {
+  .login-card {
     padding: 2rem 1.5rem;
   }
 }
