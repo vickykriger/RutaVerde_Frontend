@@ -3,13 +3,18 @@ import Header from './components/Header'
 import RegistroForm from './components/RegistroForm';
 import Footer from './components/Footer';
 import InicioForm from './components/InicioForm';
+import Inicio from './components/Inicio';
+import Estadisticas from './components/Estadisticas';
+import HistoLand from './components/HistoLand';
 
 function App() {
 
   return (
     <>
       <Header/>
-      <InicioForm/>
+      <Inicio/>
+      <Estadisticas/>
+      <HistoLand/>
       <Footer/>
     </>
   )
