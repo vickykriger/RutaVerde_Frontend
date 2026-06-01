@@ -6,6 +6,9 @@ import InicioForm from './components/InicioForm';
 import Inicio from './components/Inicio';
 import Estadisticas from './components/Estadisticas';
 import HistoLand from './components/HistoLand';
+import Noticia from './components/Noticia';
+import CarruNoti from './components/CarruNoti';
+import MapaInteractivo from './components/MapaInteractivo';
 
 function App() {
 
@@ -15,6 +18,8 @@ function App() {
       <Inicio/>
       <Estadisticas/>
       <HistoLand/>
+      <CarruNoti/>
+      <MapaInteractivo/>
       <Footer/>
     </>
   )
