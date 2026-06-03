@@ -13,8 +13,8 @@ const Header: React.FC = () => {
         </div>
 
         <nav className="nav-menu">
-          <a href="/" className="nav-link">Inicio</a>
-          <a href="/mapa" className="nav-link active">Mapa</a>
+          <a href="/" className="nav-link active">Inicio</a>
+          <a href="/mapa" className="nav-link">Mapa</a>
           <a href="/noticias" className="nav-link">Noticias</a>
           <a href="/aportes" className="nav-link">Aportes</a>
           <a href="/historia" className="nav-link">Historia</a>
