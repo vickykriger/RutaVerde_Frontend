@@ -11,15 +11,47 @@ import CarruNoti from './components/CarruNoti';
 import MapaInteractivo from './components/MapaInteractivo';
 
 function App() {
+  const [showLoginForm, setShowLoginForm] = useState(false);
+  const [showRegisterForm, setShowRegisterForm] = useState(false);
+
+  const handleBackToHome = () => {
+    setShowLoginForm(false);
+    setShowRegisterForm(false);
+  };
+
+  const handleGoToLogin = () => {
+    setShowLoginForm(true);
+    setShowRegisterForm(false);
+  };
+
+  const handleGoToRegister = () => {
+    setShowLoginForm(false);
+    setShowRegisterForm(true);
+  };
+
+  const isFormView = showLoginForm || showRegisterForm;
 
   return (
     <>
-      <Header/>
-      <Inicio/>
-      <Estadisticas/>
-      <HistoLand/>
-      <CarruNoti/>
-      <MapaInteractivo/>
+      <Header 
+        onLoginClick={handleGoToLogin} 
+        onRegisterClick={handleGoToRegister}
+        onLogoClick={handleBackToHome}
+        isFormView={isFormView}
+      />
+      {showLoginForm ? (
+        <InicioForm onRegisterClick={handleGoToRegister} />
+      ) : showRegisterForm ? (
+        <RegistroForm onLoginClick={handleGoToLogin} />
+      ) : (
+        <>
+          <Inicio/>
+          <Estadisticas/>
+          <HistoLand/>
+          <CarruNoti/>
+          <MapaInteractivo/>
+        </>
+      )}
       <Footer/>
     </>
   )

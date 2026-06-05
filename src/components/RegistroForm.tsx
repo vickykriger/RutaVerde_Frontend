@@ -1,7 +1,11 @@
 import React from 'react';
 import './RegistroForm.css';
 
-const RegistroForm: React.FC = () => {
+interface RegistroFormProps {
+  onLoginClick?: () => void;
+}
+
+const RegistroForm: React.FC<RegistroFormProps> = ({ onLoginClick }) => {
   return (
     <div className="registro-container">
       <div className="registro-card">
@@ -40,7 +44,14 @@ const RegistroForm: React.FC = () => {
         </form>
 
         <div className="registro-footer">
-          <a href="/login" className="login-link">¿Ya tenés cuenta? Iniciá sesión &rarr;</a>
+          <button 
+            type="button" 
+            onClick={onLoginClick}
+            className="login-link"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', textDecoration: 'underline' }}
+          >
+            ¿Ya tenés cuenta? Iniciá sesión &rarr;
+          </button>
         </div>
       </div>
     </div>
