@@ -9,6 +9,9 @@ import HistoLand from './components/HistoLand';
 import Noticia from './components/Noticia';
 import CarruNoti from './components/CarruNoti';
 import MapaInteractivo from './components/MapaInteractivo';
+import SubirBaldosa from './components/SubirBaldosa';
+import InicioHistoria from './components/InicioHistoria';
+import Historia from './components/Historia';
 
 function App() {
   const [showLoginForm, setShowLoginForm] = useState(false);
@@ -50,6 +53,8 @@ function App() {
           <HistoLand/>
           <CarruNoti/>
           <MapaInteractivo/>
+          <SubirBaldosa/>
+          <Historia/>
         </>
       )}
       <Footer/>

@@ -10,7 +10,7 @@ const RegistroForm: React.FC<RegistroFormProps> = ({ onLoginClick }) => {
     <div className="registro-container">
       <div className="registro-card">
         <h1 className="registro-title">Crear cuenta</h1>
-        <p className="registro-subtitle">Sumáte al corredor biológico nacional</p>
+        <p className="registro-subtitle">Sumáte al corredor biológico</p>
         
         <hr className="divider" />
 
