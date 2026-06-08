@@ -53,8 +53,6 @@ function App() {
           <HistoLand/>
           <CarruNoti/>
           <MapaInteractivo/>
-          <SubirBaldosa/>
-          <Historia/>
         </>
       )}
       <Footer/>
