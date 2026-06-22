@@ -12,6 +12,9 @@ import MapaInteractivo from './components/MapaInteractivo';
 import SubirBaldosa from './components/SubirBaldosa';
 import InicioHistoria from './components/InicioHistoria';
 import Historia from './components/Historia';
+import LTtit from './components/LTtit';
+import LineaTiempo from './components/LineaTiempo';
+
 
 function App() {
   const [showLoginForm, setShowLoginForm] = useState(false);
@@ -53,6 +56,15 @@ function App() {
           <HistoLand/>
           <CarruNoti/>
           <MapaInteractivo/>
+          <InicioHistoria/>
+          <Estadisticas/>
+          <Historia/>
+          <Historia/>
+          <LTtit/>
+          <LineaTiempo/>
+          <LineaTiempo/>
+          <LineaTiempo/>
+          <LineaTiempo/>
         </>
       )}
       <Footer/>
