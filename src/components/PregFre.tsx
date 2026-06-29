@@ -7,7 +7,7 @@ interface FAQProps {
 }
 
 const FAQItem: React.FC<FAQProps> = ({ 
-  question = "¿Qué es Ruta Verde?", 
+  question = "¿Qué es Ruta Verde?", //hola
   answer = "Ruta Verde es una iniciativa enfocada en la sostenibilidad y el cuidado del medio ambiente, promoviendo prácticas ecológicas y rutas de transporte limpio." 
 }) => {
   const [isOpen, setIsOpen] = useState(false);
