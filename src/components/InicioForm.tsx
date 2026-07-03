@@ -1,11 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './InicioForm.css';
 
-interface InicioFormProps {
-  onRegisterClick?: () => void;
-}
+const InicioForm: React.FC = () => {
+  const navigate = useNavigate();
 
-const InicioForm: React.FC<InicioFormProps> = ({ onRegisterClick }) => {
   return (
     <div className="login-container">
       <div className="login-card">
@@ -46,7 +45,13 @@ const InicioForm: React.FC<InicioFormProps> = ({ onRegisterClick }) => {
           <span className="footer-text">¿No tenés cuenta?</span>
         </div>
 
-        <button type="button" className="btn-register-outline" onClick={onRegisterClick}>Registrate gratis</button>
+        <button 
+          type="button" 
+          className="btn-register-outline" 
+          onClick={() => navigate('/registrarse')}
+        >
+          Registrate gratis
+        </button>
       </div>
     </div>
   );

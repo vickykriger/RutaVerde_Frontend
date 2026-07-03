@@ -1,11 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './RegistroForm.css';
 
-interface RegistroFormProps {
-  onLoginClick?: () => void;
-}
+const RegistroForm: React.FC = () => {
+  const navigate = useNavigate();
 
-const RegistroForm: React.FC<RegistroFormProps> = ({ onLoginClick }) => {
   return (
     <div className="registro-container">
       <div className="registro-card">
@@ -32,8 +31,8 @@ const RegistroForm: React.FC<RegistroFormProps> = ({ onLoginClick }) => {
 
           <div className="form-group">
             <label htmlFor="region">Región</label>
-            <select id="region">
-              <option value="" disabled selected>Seleccioná tu región</option>
+            <select id="region" defaultValue="">
+              <option value="" disabled>Seleccioná tu región</option>
               <option value="central">Región Central</option>
               <option value="chorotega">Región Chorotega</option>
               <option value="brunca">Región Brunca</option>
@@ -46,7 +45,7 @@ const RegistroForm: React.FC<RegistroFormProps> = ({ onLoginClick }) => {
         <div className="registro-footer">
           <button 
             type="button" 
-            onClick={onLoginClick}
+            onClick={() => navigate('/ingresar')}
             className="login-link"
             style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', textDecoration: 'underline' }}
           >

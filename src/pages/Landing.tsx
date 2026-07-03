@@ -5,7 +5,7 @@ import Estadisticas from '../components/Estadisticas';
 import HistoLand from '../components/HistoLand';
 import CarruNoti from '../components/CarruNoti';
 import MapaInteractivo from '../components/MapaInteractivo';
-import InicioHistoria from '../components/InicioHistoria';
+
 
 export default function Landing() {
   return (
@@ -16,8 +16,7 @@ export default function Landing() {
       <HistoLand />
       <CarruNoti />
       <MapaInteractivo />
-      <InicioHistoria />
-      <Estadisticas />
+    
     </>
   );
 }
