@@ -1,4 +1,4 @@
-// src/App.tsx
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Landing from './pages/Landing';
 import Historia from './pages/Historia';
@@ -16,7 +16,7 @@ function App() {
         <Route path="/aportes" element={<Aportes />} />
         <Route path="/ingresar" element={<InicioForm />} />
         <Route path="/registrarse" element={<RegistroForm />} />
-        {/* agregá /mapa y /noticias cuando tengas esas páginas armadas */}
+        {/* agregáár /mapa y /noticias cuando esten armadas */}
       </Routes>
       <Footer />
     </BrowserRouter>
