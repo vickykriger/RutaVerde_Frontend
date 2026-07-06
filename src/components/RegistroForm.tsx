@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import api from '../../api.js';
 import './RegistroForm.css';
 
-interface RegistroFormProps {
-  onLoginClick?: () => void;
-}
+const RegistroForm: React.FC = () => {
+  const navigate = useNavigate();
 
 const RegistroForm: React.FC<RegistroFormProps> = ({ onLoginClick }) => {
   // 1. Estados para controlar los campos del formulario
@@ -111,7 +110,7 @@ const RegistroForm: React.FC<RegistroFormProps> = ({ onLoginClick }) => {
         <div className="registro-footer">
           <button 
             type="button" 
-            onClick={onLoginClick}
+            onClick={() => navigate('/ingresar')}
             className="login-link"
             style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', textDecoration: 'underline' }}
           >
