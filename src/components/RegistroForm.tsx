@@ -1,44 +1,42 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import api from '../../api.js';
 import './RegistroForm.css';
 
-const RegistroForm: React.FC = () => {
-  const navigate = useNavigate();
+interface RegistroFormProps {
+  onLoginClick?: () => void;
+}
 
 const RegistroForm: React.FC<RegistroFormProps> = ({ onLoginClick }) => {
-  // 1. Estados para controlar los campos del formulario
+  const navigate = useNavigate();
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [contrasenia, setContrasenia] = useState('');
   const [region, setRegion] = useState('');
 
-  // 2. Función para manejar el envío de datos
   const manejarRegistro = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validación básica en Frontend antes de mandar el paquete
     if (!nombre || !email || !contrasenia || !region) {
       alert("Por favor, completa todos los campos.");
       return;
     }
 
     try {
-      // Convertimos el valor del select a los IDs numéricos que tu backend/Supabase esperan
       let idRegionNum = 1; 
       if (region === 'chorotega') idRegionNum = 2;
       if (region === 'brunca') idRegionNum = 3;
 
-      // 3. Petición POST al endpoint de registro
       const respuesta = await api.post('/api/registro', {
         nombre,
         email,
         contrasenia,
-        region: idRegionNum // Enviamos el número esperado por la base de datos
+        region: idRegionNum 
       });
 
       if (respuesta.data.success) {
         alert("🎉 ¡Cuenta creada con éxito! Ya podés iniciar sesión.");
-        if (onLoginClick) onLoginClick(); // Redirige al login automáticamente
+        if (onLoginClick) onLoginClick();
       } else {
         alert(`Error: ${respuesta.data.error}`);
       }
