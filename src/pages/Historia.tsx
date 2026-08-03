@@ -28,7 +28,7 @@ export default function Historia() {
       <LT3 />
       <LT4 />
       <PFtit />
-      <PregFre />
+      {/*<PregFre />*/}
       <PregFre2 />
       <PregFre3 />
     </>

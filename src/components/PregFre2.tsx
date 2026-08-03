@@ -7,7 +7,7 @@ interface FAQProps {
 }
 
 const FAQItem: React.FC<FAQProps> = ({ 
-  question = "¿Cómo se que plantear?", 
+  question = "¿Cómo se qué plantar?", 
   answer = "Necesito hacer...." 
 }) => {
   const [isOpen, setIsOpen] = useState(false);

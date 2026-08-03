@@ -1,6 +1,6 @@
 .historia-container {
   background-color: #f5f7f2; /* Fondo crema suave */
-  padding: 80px 40px;
+  padding: 60px 20px; /* Reducimos padding horizontal y vertical */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -8,22 +8,22 @@
 }
 
 .historia-content {
-  max-width: 900px;
+  max-width: 1300px; /* Aumentado de 900px a 1300px para aprovechar los costados */
   width: 100%;
 }
 
 .historia-title {
-  color: #8cb811; /* Verde lima característico */
-  font-size: 2.5rem;
+  color: #8cb811;
+  font-size: 1.8rem; /* Achicado de 2.5rem a 1.8rem */
   font-weight: 700;
-  margin-bottom: 2rem;
+  margin-bottom: 1.2rem;
   letter-spacing: -0.02em;
 }
 
 .historia-text p {
   color: #4a4a4a;
-  font-size: 1.125rem;
-  line-height: 1.7;
+  font-size: 0.95rem; /* Achicado de 1.125rem a 0.95rem (15px aprox) */
+  line-height: 1.6;
   margin-bottom: 1.5rem;
 }
 

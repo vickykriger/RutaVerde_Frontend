@@ -1,4 +1,3 @@
-// src/pages/Landing.tsx
 import Header from '../components/Header';
 import Inicio from '../components/Inicio';
 import Estadisticas from '../components/Estadisticas';

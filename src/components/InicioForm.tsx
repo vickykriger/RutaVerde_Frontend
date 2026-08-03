@@ -3,7 +3,7 @@ import './InicioForm.css';
 import api from '../../api.js';
 
 interface InicioFormProps {
-  onRegisterClick: () => void;
+  onRegisterClick?: () => void;
 }
 
 const InicioForm: React.FC<InicioFormProps> = ({ onRegisterClick }) => {

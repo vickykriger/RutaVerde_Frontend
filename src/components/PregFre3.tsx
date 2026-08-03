@@ -8,7 +8,7 @@ interface FAQProps {
 
 const FAQItem: React.FC<FAQProps> = ({ 
   question = "¿Cómo subo mi baldosa?", 
-  answer = "Para subir mi baldosa, primero debo...." 
+  answer = "Para poder subir tu baldosa, debes entrar a la pestaña llamada 'Aportes' y completar la información pedida y correspondiente." 
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 

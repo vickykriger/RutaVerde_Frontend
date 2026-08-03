@@ -12,7 +12,7 @@ const LineaTiempo: React.FC = () => {
       </div>
       <div className="timeline-content">
         <span className="timeline-year">2024</span>
-        <h3 className="timeline-event-title">Encuentro en River Plate"</h3>
+        <h3 className="timeline-event-title">Encuentro en River Plate</h3>
         <p className="timeline-description">
           Juan Carr convoca a docentes y voluntarios en el Club River Plate para formalizar el proyecto. Se establece la meta de plantar 22 árboles por cada niño que nace.          
         </p>
