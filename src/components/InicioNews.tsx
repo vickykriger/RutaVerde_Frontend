@@ -1,20 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { noticias } from '../data/noticias';
+import NoticiaModal from './NoticiaModal';
 import './InicioNews.css';
 
 const InicioNews: React.FC = () => {
+  const destacada = noticias[0];
+  const [abierta, setAbierta] = useState(false);
+
   return (
-    <section className="inicio-news">
-      <div className="inicio-news-container">
-        <div className="inicio-news-content">
-          <h1 className="inicio-news-title">"Biocorredor Tahalú avanza en la Red Verde SER — Chacarita"</h1>
-          <p className="inicio-news-description">
-            El corredor biológico avanza en la región chaqueña con más de 200 nuevas plantas nativas.
-          </p>
-          <p className="inicio-news-meta">Marzo 2025 · 4 min de lectura</p>
-          <button className="btn-leer-nota">Leer nota →</button>
+    <>
+      <section className="inicio-news">
+        <div className="inicio-news-container">
+          <div className="inicio-news-content">
+            <p className="inicio-news-badge">DESTACADA</p>
+            <h1 className="inicio-news-title">{destacada.titulo}</h1>
+            <p className="inicio-news-description">{destacada.descripcion}</p>
+            <p className="inicio-news-meta">{destacada.fecha} · {destacada.lectura}</p>
+            <button className="btn-leer-nota" onClick={() => setAbierta(true)}>
+              Leer nota →
+            </button>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {abierta && (
+        <NoticiaModal noticia={destacada} onClose={() => setAbierta(false)} />
+      )}
+    </>
   );
 };
 
