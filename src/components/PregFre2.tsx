@@ -8,7 +8,7 @@ interface FAQProps {
 
 const FAQItem: React.FC<FAQProps> = ({ 
   question = "¿Cómo se qué plantar?", 
-  answer = "Necesito hacer...." 
+  answer = "Busca cuál es la ecoregión en la que queres plantar, luego información de esta y sus plantas nativas. Elegí una semilla en base a lo que corresponda" 
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 

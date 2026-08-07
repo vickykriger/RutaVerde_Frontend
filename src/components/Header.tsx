@@ -19,7 +19,7 @@ const Header: React.FC = () => {
         <nav className="nav-menu">
           <NavLink to="/" end className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Inicio</NavLink>
           <NavLink to="/mapa" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Mapa</NavLink>
-          <NavLink to="/noticias" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Noticias</NavLink>
+          <NavLink to="/newsletter" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Newsletter</NavLink>
           <NavLink to="/aportes" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Aportes</NavLink>
           <NavLink to="/historia" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>Historia</NavLink>
         </nav>

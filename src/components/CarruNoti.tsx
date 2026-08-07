@@ -28,7 +28,7 @@ const CarruNoti: React.FC = () => {
   return (
     <section className="carru-noti">
       <div className="carru-noti-container">
-        <h2 className="carru-noti-headline">Últimas noticias</h2>
+        <h2 className="carru-noti-headline">Noticias</h2>
         <div className="carru-noti-grid">
           {noticias.map((noti) => (
             <Noticia 
