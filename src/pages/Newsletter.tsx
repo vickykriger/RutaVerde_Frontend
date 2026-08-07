@@ -1,14 +1,14 @@
 import Header from '../components/Header';
-import CarruNoti from '../components/CarruNoti';
 import InicioNews from '../components/InicioNews';
+import GrillaNews from '../components/GrillaNews';
 
-export default function Landing() {
+export default function Newsletter() {
   return (
     <>
       <Header />
       <InicioNews />
-      <CarruNoti />
-  
+      <GrillaNews />
+
     </>
   );
 }
