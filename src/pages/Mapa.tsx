@@ -1,4 +1,5 @@
 import Header from '../components/Header';
+import MapaComponente from '../components/Mapa';
 import ListaEcorregiones from '../components/ListaEcorregiones';
 import '../components/MapaPage.css';
 
@@ -11,8 +12,7 @@ export default function Mapa() {
           {/* Lado izquierdo: mapa */}
           <div className="mapa-izquierda">
             <div className="mapa-placeholder">
-              {/* Aquí va Mapa.tsx cuando esté disponible */}
-              <p className="mapa-placeholder-label">Corredor Biológico Nacional</p>
+              <MapaComponente />
             </div>
           </div>
 
