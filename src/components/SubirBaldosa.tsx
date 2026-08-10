@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import api from '../../api';
 import './SubirBaldosa.css';
 
@@ -6,15 +6,39 @@ interface SubirBaldosaProps {
   onRegisterClick?: () => void;
 }
 
+// Representa las columnas 'id' y 'nombre' de tu tabla Regiones
+interface Region {
+  id: number;
+  nombre: string;
+}
+
 const SubirBaldosa: React.FC<SubirBaldosaProps> = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [planta, setPlanta] = useState('');
-  const [region, setRegion] = useState('');
+  const [region, setRegion] = useState(''); // Guardará el id de la región seleccionada
+  const [listaRegiones, setListaRegiones] = useState<Region[]>([]);
   const [tamano, setTamano] = useState('');
   const [comentarios, setComentarios] = useState('');
   const [imagenArchivo, setImagenArchivo] = useState<File | null>(null);
   const [nombreImagen, setNombreImagen] = useState('Ningún archivo seleccionado');
+
+  // Pedir las regiones al backend cuando el componente se carga
+ useEffect(() => {
+  const cargarRegiones = async () => {
+    try {
+      const respuesta = await api.get('/api/regiones');
+      console.log('📌 Datos recibidos de la BD:', respuesta.data); // 👈 AGREGA ESTE LOG
+      if (Array.isArray(respuesta.data)) {
+        setListaRegiones(respuesta.data);
+      }
+    } catch (error) {
+      console.error('Error al pedir la lista de regiones:', error);
+    }
+  };
+
+  cargarRegiones();
+}, []);
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -41,14 +65,10 @@ const SubirBaldosa: React.FC<SubirBaldosaProps> = () => {
       return;
     }
 
-    let idRegionNum = 1;
-    if (region === 'chorotega') idRegionNum = 2;
-    if (region === 'brunca') idRegionNum = 3;
-
     try {
       const formData = new FormData();
       formData.append('nombrePlanta', planta);
-      formData.append('idRegion', idRegionNum.toString());
+      formData.append('idRegion', region); // Envía directamente el ID de la región elegida
       formData.append('tamanio', tamano);
       formData.append('comentarios', comentarios);
       formData.append('imagen', imagenArchivo);
@@ -98,11 +118,18 @@ const SubirBaldosa: React.FC<SubirBaldosaProps> = () => {
 
           <div className="form-group">
             <label htmlFor="region">Región</label>
-            <select id="region" value={region} onChange={(e) => setRegion(e.target.value)} required>
+            <select 
+              id="region" 
+              value={region} 
+              onChange={(e) => setRegion(e.target.value)} 
+              required
+            >
               <option value="" disabled>Seleccioná tu región</option>
-              <option value="central">Región Central</option>
-              <option value="chorotega">Región Chorotega</option>
-              <option value="brunca">Región Brunca</option>
+              {listaRegiones.map((reg) => (
+                <option key={reg.id} value={reg.id}>
+                  {reg.nombre}
+                </option>
+              ))}
             </select>
           </div>
 
