@@ -1,7 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './MapaInteractivo.css';
 
 const MapaInteractivo: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <section className="mapa-interactivo">
       <div className="mapa-container">
@@ -12,7 +14,7 @@ const MapaInteractivo: React.FC = () => {
           </p>
         </div>
         
-        <div className="map-visual">
+        <div className="map-visual" onClick={() => navigate('/mapa')} style={{ cursor: 'pointer' }}>
           <div className="map-overlay-text">
             Mapa interactivo · Corredor Biológico Nacional
           </div>

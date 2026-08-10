@@ -1,7 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Inicio.css';
 
 const Inicio: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <section className="inicio">
       <div className="inicio-container">
@@ -11,7 +13,7 @@ const Inicio: React.FC = () => {
           <p className="inicio-description">
             Conectamos comunidades para crear un corredor biológico a lo largo del continente con especies nativas.
           </p>
-          <button className="btn-explorar">Explorar mapa</button>
+          <button className="btn-explorar" onClick={() => navigate('/mapa')}>Explorar mapa</button>
         </div>
         <div className="inicio-map-container">
           <div className="map-wrapper">

@@ -1,32 +1,61 @@
 .historia-container {
-  background-color: #f5f7f2; /* Fondo crema suave */
-  padding: 60px 20px; /* Reducimos padding horizontal y vertical */
+  background-color: #f5f7f2;
+  padding: 72px 24px;
   display: flex;
   justify-content: center;
-  align-items: center;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .historia-content {
-  max-width: 1300px; /* Aumentado de 900px a 1300px para aprovechar los costados */
+  max-width: 780px; /* columna de lectura cómoda */
   width: 100%;
 }
 
+/* ── Bloques ── */
+.historia-bloque {
+  padding-bottom: 56px;
+  margin-bottom: 56px;
+  border-bottom: 1px solid #d8e4c2;
+}
+
+.historia-bloque--last {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* ── Títulos ── */
 .historia-title {
   color: #8cb811;
-  font-size: 1.8rem; /* Achicado de 2.5rem a 1.8rem */
+  font-size: 1.6rem;
   font-weight: 700;
-  margin-bottom: 1.2rem;
-  letter-spacing: -0.02em;
-}
-
-.historia-text p {
-  color: #4a4a4a;
-  font-size: 0.95rem; /* Achicado de 1.125rem a 0.95rem (15px aprox) */
-  line-height: 1.6;
   margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
-.historia-text p:last-child {
+/* ── Párrafo de apertura: un poco más destacado ── */
+.historia-intro {
+  color: #3a3a3a;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  margin-bottom: 1.4rem;
+  font-weight: 500;
+}
+
+/* ── Párrafos normales ── */
+.historia-text-p {
+  color: #555;
+  font-size: 0.96rem;
+  line-height: 1.8;
+  margin-bottom: 1.2rem;
+}
+
+.historia-text-p:last-child {
   margin-bottom: 0;
+}
+
+.historia-text-p strong {
+  color: #3a3a3a;
+  font-weight: 600;
 }
