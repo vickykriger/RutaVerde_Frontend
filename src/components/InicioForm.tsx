@@ -24,6 +24,7 @@ const InicioForm: React.FC<InicioFormProps> = ({ onRegisterClick }) => {
 
       if (respuesta.data.success) {
         console.log("¡Logueado con éxito!", respuesta.data.usuario);
+        alert("¡Logueado con éxito!");
         // Aquí puedes redirigir al usuario o guardar su sesión
       }
     } catch (error) {
