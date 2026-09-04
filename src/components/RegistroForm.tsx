@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import api from '../../api.js';
 import './RegistroForm.css';
+import { useAuth } from '../context/AuthContext';
 
 interface RegistroFormProps {
   onLoginClick?: () => void;
@@ -9,6 +10,7 @@ interface RegistroFormProps {
 
 const RegistroForm: React.FC<RegistroFormProps> = ({ onLoginClick }) => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [contrasenia, setContrasenia] = useState('');
@@ -34,12 +36,20 @@ const RegistroForm: React.FC<RegistroFormProps> = ({ onLoginClick }) => {
         region: idRegionNum 
       });
 
-      if (respuesta.data.success) {
-        alert("🎉 ¡Cuenta creada con éxito! Ya podés iniciar sesión.");
-        if (onLoginClick) onLoginClick();
-      } else {
+      if (respuesta.data.error) {
         alert(`Error: ${respuesta.data.error}`);
+        return;
       }
+
+      // Aceptamos la respuesta tanto si viene con success:true como si viene directamente el usuario
+      const usuarioData = respuesta.data?.usuario ?? respuesta.data;
+      login({
+        id: usuarioData?.id ?? 0,
+        nombre: usuarioData?.nombre ?? nombre,
+        email: usuarioData?.email ?? email,
+        ...usuarioData,
+      });
+      navigate('/perfil');
     } catch (error: any) {
       console.error("Error en el registro:", error.response?.data?.error || error.message);
       alert(error.response?.data?.error || "Hubo un problema al crear tu cuenta.");

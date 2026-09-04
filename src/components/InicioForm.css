@@ -147,3 +147,30 @@
     padding: 2rem 1.5rem;
   }
 }
+
+.login-register-text {
+  text-align: center;
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.login-register-text .btn-register-outline {
+  display: inline;
+  width: auto;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--green-primary);
+  cursor: pointer;
+  margin-top: 0;
+  transition: opacity 0.2s ease;
+}
+
+.login-register-text .btn-register-outline:hover {
+  opacity: 0.75;
+  background: none;
+}
