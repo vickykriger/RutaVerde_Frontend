@@ -33,7 +33,6 @@ const ListaEcorregiones: React.FC = () => {
                 <p className="eco-detalle-resumen">{eco.resumen}</p>
                 <div className="eco-detalle-tags">
                   <span className="eco-tag">{eco.bioma}</span>
-                  <span className="eco-tag">{eco.superficie}</span>
                 </div>
               </div>
             )}
