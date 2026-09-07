@@ -117,8 +117,9 @@
 
 /* ── Estadísticas ── */
 .pu-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
   background-color: var(--green-dark);
   border-radius: 1rem;
   overflow: hidden;
@@ -126,17 +127,28 @@
 }
 
 .pu-stat-item {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1.25rem 1rem;
-  gap: 0.25rem;
-  border-right: 1px solid rgba(255,255,255,0.15);
+  padding: 1.5rem 1rem;
+  gap: 0.3rem;
 }
 
-.pu-stat-item:last-child {
-  border-right: none;
+.pu-stat-divider {
+  width: 1px;
+  flex-shrink: 0;
+  background-color: rgba(255, 255, 255, 0.18);
+  align-self: stretch;
+}
+
+.pu-stat-center {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
 }
 
 .pu-stat-num {
@@ -150,6 +162,26 @@
   font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.85);
   font-weight: 500;
+  text-align: center;
+}
+
+.pu-btn-editar-stats {
+  padding: 0.45rem 1.4rem;
+  background-color: transparent;
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  border-radius: 6.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.pu-btn-editar-stats:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.85);
+  transform: scale(1.04);
 }
 
 /* ── Secciones ── */
@@ -170,73 +202,78 @@
   margin: 0 0 1.25rem 0;
 }
 
-/* ── Grid de tarjetas ── */
-.pu-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
+/* ── Sin información ── */
+.pu-sin-info {
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 1.5rem 0 0.5rem;
+  margin: 0;
 }
 
-.pu-card {
-  background-color: var(--bg-cream);
-  border-radius: 0.875rem;
-  overflow: hidden;
-  box-shadow: 0 2px 8px var(--shadow-color);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+/* ── Tu actividad ── */
+.pu-actividad-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-.pu-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+.pu-actividad-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  padding: 0.75rem 0;
+  position: relative;
 }
 
-.pu-card-img {
-  width: 100%;
-  height: 9rem;
-  object-fit: cover;
+/* Línea vertical continua entre puntos */
+.pu-actividad-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 0.5rem;
+  top: calc(0.75rem + 1.1rem);
+  width: 2px;
+  bottom: 0;
+  background-color: var(--green-primary);
+  opacity: 0.25;
+}
+
+.pu-actividad-dot {
+  flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  background-color: var(--green-primary);
+  margin-top: 0.2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.pu-actividad-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.pu-actividad-fecha {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
   display: block;
+  margin-bottom: 0.15rem;
 }
 
-.pu-card-body {
-  padding: 0.875rem;
-}
-
-.pu-card-titulo {
+.pu-actividad-titulo {
   font-size: 0.9375rem;
   font-weight: 700;
   color: var(--text-dark);
-  margin: 0 0 0.35rem 0;
-  line-height: 1.3;
+  margin: 0 0 0.1rem 0;
 }
 
-.pu-card-lugar {
-  font-size: 0.8125rem;
+.pu-actividad-sub {
+  font-size: 0.875rem;
   color: var(--text-muted);
-  margin: 0 0 0.3rem 0;
-}
-
-.pu-card-stats {
-  font-size: 0.8125rem;
-  color: var(--text-light);
   margin: 0;
-}
-
-.pu-card-estrellas {
-  font-size: 0.8125rem;
-  color: #f5a623;
-  margin: 0;
-}
-
-.pu-card-resenas {
-  color: var(--text-muted);
-  margin-left: 0.25rem;
-}
-
-.pu-card-ver {
-  color: var(--green-primary);
-  font-weight: 600;
-  margin-left: 0.75rem;
-  cursor: pointer;
 }
 
 /* ── Botón cerrar sesión ── */
@@ -502,14 +539,6 @@
     justify-content: center;
   }
 
-  .pu-stats {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .pu-grid {
-    grid-template-columns: 1fr;
-  }
-
   .pu-modal-row {
     grid-template-columns: 1fr;
   }
@@ -521,15 +550,16 @@
   }
 
   .pu-stats {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 
-  .pu-stat-item {
-    border-right: none;
-    border-bottom: 1px solid rgba(255,255,255,0.15);
+  .pu-stat-divider {
+    width: auto;
+    height: 1px;
+    align-self: stretch;
   }
 
-  .pu-stat-item:last-child {
-    border-bottom: none;
+  .pu-stat-center {
+    padding: 0.75rem 1rem;
   }
 }

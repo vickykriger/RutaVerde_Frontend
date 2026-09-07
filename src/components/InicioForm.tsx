@@ -11,21 +11,46 @@ interface InicioFormProps {
 const InicioForm: React.FC<InicioFormProps> = ({ onRegisterClick }) => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  // 1. Creamos estados para guardar lo que escribe el usuario
   const [email, setEmail] = useState('');
   const [contrasenia, setContrasenia] = useState('');
+  const [error, setError] = useState('');
+  const [camposError, setCamposError] = useState<{ email?: boolean; contrasenia?: boolean }>({});
 
-  // 2. Función que maneja el envío del formulario
   const manejarLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setCamposError({});
+
+    // Validación local antes de llamar al backend
+    const errores: { email?: boolean; contrasenia?: boolean } = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email.trim()) {
+      errores.email = true;
+    } else if (!emailRegex.test(email.trim())) {
+      errores.email = true;
+    }
+
+    if (!contrasenia) {
+      errores.contrasenia = true;
+    } else if (contrasenia.length < 6) {
+      errores.contrasenia = true;
+    }
+
+    if (Object.keys(errores).length > 0) {
+      setCamposError(errores);
+      if (errores.email && errores.contrasenia) {
+        setError('Completá el correo y la contraseña correctamente.');
+      } else if (errores.email) {
+        setError('Ingresá un correo electrónico válido.');
+      } else {
+        setError('La contraseña debe tener al menos 6 caracteres.');
+      }
+      return;
+    }
 
     try {
-      const respuesta = await api.post('/api/login', {
-        email: email,
-        contrasenia: contrasenia
-      });
-
-      // Aceptamos la respuesta tanto si viene con success:true como si viene directamente el usuario
+      const respuesta = await api.post('/api/login', { email, contrasenia });
       const usuarioData = respuesta.data?.usuario ?? respuesta.data;
       login({
         id: usuarioData?.id ?? 0,
@@ -34,9 +59,9 @@ const InicioForm: React.FC<InicioFormProps> = ({ onRegisterClick }) => {
         ...usuarioData,
       });
       navigate('/perfil');
-    } catch (error: any) {
-      console.error("Error en el login:", error?.response?.data?.error || error?.message);
-      alert("Error al iniciar sesión. Revisa tus credenciales.");
+    } catch (err: any) {
+      setError('La contraseña es incorrecta. Revisá e intentá de nuevo.');
+      setCamposError({ contrasenia: true });
     }
   };
 
@@ -47,8 +72,8 @@ const InicioForm: React.FC<InicioFormProps> = ({ onRegisterClick }) => {
         <p className="login-subtitle">Ingresá a tu cuenta de Ruta Verde</p>
         <hr className="divider" />
 
-        {/* Añadimos el onSubmit al formulario */}
         <form className="login-form" onSubmit={manejarLogin}>
+          {error && <p className="form-error-banner">{error}</p>}
           <div className="form-group">
             <label htmlFor="email">Correo electrónico</label>
             <input
@@ -57,7 +82,8 @@ const InicioForm: React.FC<InicioFormProps> = ({ onRegisterClick }) => {
               placeholder="correo@ejemplo.com"
               autoComplete="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)} // Guardamos el cambio
+              className={camposError.email ? 'input-error' : ''}
+              onChange={(e) => { setEmail(e.target.value); setCamposError(p => ({ ...p, email: false })); }}
             />
           </div>
 
@@ -69,7 +95,8 @@ const InicioForm: React.FC<InicioFormProps> = ({ onRegisterClick }) => {
               placeholder="contraseña"
               autoComplete="current-password"
               value={contrasenia}
-              onChange={(e) => setContrasenia(e.target.value)} // Guardamos el cambio
+              className={camposError.contrasenia ? 'input-error' : ''}
+              onChange={(e) => { setContrasenia(e.target.value); setCamposError(p => ({ ...p, contrasenia: false })); }}
             />
           </div>
 
