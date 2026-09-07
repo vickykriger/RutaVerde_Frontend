@@ -2,62 +2,72 @@ import React, { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import './PerfilUser.css';
 
-// ── Publicaciones y Viveros mock (se reemplazarán por datos reales) ──
-const publicacionesMock = [
-  { id: 1, titulo: 'Jornada de plantación en Delta de Tigre', lugar: 'Tigre, Buenos Aires', hace: 'hace 3 días', arboles: 28, voluntarios: 12, img: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=200&fit=crop' },
-  { id: 2, titulo: 'Alianza con Escuela N°12 para baldosas verdes', lugar: 'Córdoba Rd. Av. · Hace 1 semana', hace: 'hace 1 semana', arboles: 26, voluntarios: 12, img: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&h=200&fit=crop' },
-  { id: 3, titulo: 'Vivero comunitario en Villa La Ñata', lugar: 'Ciudad de Bs. As. · Hace 4 semanas', hace: 'hace 4 semanas', arboles: 60, voluntarios: 8, img: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=400&h=200&fit=crop' },
-];
-
-const viverosMock = [
-  { id: 1, nombre: 'Vivero Raíces Nativas', lugar: 'Santiago, Buenos Aires', estrellas: 5, reseñas: 48, img: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=200&fit=crop', arboles: undefined, voluntarios: undefined },
-  { id: 2, nombre: 'Alianza con Escuela N°12 para baldosas verdes', lugar: 'Córdoba Rd. Av. · Hace 1 semana', arboles: 26, voluntarios: 12, img: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&h=200&fit=crop', estrellas: undefined, reseñas: undefined },
-  { id: 3, nombre: 'Vivero comunitario en Villa La Ñata', lugar: 'Ciudad de Bs. As. · Hace 4 semanas', arboles: 60, voluntarios: 8, img: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=400&h=200&fit=crop', estrellas: undefined, reseñas: undefined },
-];
-
-// ── Componente tarjeta de publicación ──
-const TarjetaPublicacion: React.FC<{ item: typeof publicacionesMock[0] }> = ({ item }) => (
-  <div className="pu-card">
-    <img src={item.img} alt={item.titulo} className="pu-card-img" />
-    <div className="pu-card-body">
-      <p className="pu-card-titulo">{item.titulo}</p>
-      <p className="pu-card-lugar">📍 {item.lugar}</p>
-      <p className="pu-card-stats">{item.arboles} árboles · {item.voluntarios} voluntarios</p>
-    </div>
-  </div>
-);
-
-// ── Componente tarjeta de vivero ──
-interface ViveroItem {
+// ── Actividad mock ──
+interface ActividadItem {
   id: number;
-  nombre: string;
-  lugar: string;
-  img: string;
-  estrellas?: number;
-  reseñas?: number;
-  arboles?: number;
-  voluntarios?: number;
+  fecha: string;
+  titulo: string;
+  sub: string;
 }
 
-const TarjetaVivero: React.FC<{ item: ViveroItem }> = ({ item }) => (
-  <div className="pu-card">
-    <img src={item.img} alt={item.nombre} className="pu-card-img" />
-    <div className="pu-card-body">
-      <p className="pu-card-titulo">{item.nombre}</p>
-      <p className="pu-card-lugar">📍 {item.lugar}</p>
-      {item.estrellas && (
-        <p className="pu-card-estrellas">
-          {'★'.repeat(item.estrellas)}{'☆'.repeat(5 - item.estrellas)}
-          <span className="pu-card-resenas"> ({item.reseñas})</span>
-          <span className="pu-card-ver"> Ver vivero</span>
-        </p>
-      )}
-      {item.arboles && (
-        <p className="pu-card-stats">{item.arboles} árboles · {item.voluntarios} voluntarios</p>
-      )}
-    </div>
-  </div>
+const actividadMock: ActividadItem[] = [
+  { id: 1, fecha: '04/8/25', titulo: 'Plantaste una "x"', sub: 'Plantada en la ecorregión "x"' },
+  { id: 2, fecha: '04/8/25', titulo: 'Plantaste una "x"', sub: 'Plantada en la ecorregión "x"' },
+  { id: 3, fecha: '04/8/25', titulo: 'Plantaste una "x"', sub: 'Plantada en la ecorregión "x"' },
+  { id: 4, fecha: '04/8/25', titulo: 'Plantaste una "x"', sub: 'Plantada en la ecorregión "x"' },
+  { id: 5, fecha: '04/8/25', titulo: 'Plantaste una "x"', sub: 'Plantada en la ecorregión "x"' },
+  { id: 6, fecha: '04/8/25', titulo: 'Plantaste una "x"', sub: 'Plantada en la ecorregión "x"' },
+];
+
+// ── Estado vacío ──
+const SinInformacion: React.FC = () => (
+  <p className="pu-sin-info">Sin información registrada</p>
 );
+
+// ── Modal árboles plantados ──
+interface ArbolesModalProps {
+  onClose: () => void;
+}
+
+const ArbolesModal: React.FC<ArbolesModalProps> = ({ onClose }) => {
+  const { usuario, updateUsuario } = useAuth();
+
+  const [arboles, setArboles] = useState(usuario?.arbolesPlantados ?? 0);
+
+  const handleGuardar = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateUsuario({ arbolesPlantados: arboles });
+    onClose();
+  };
+
+  return (
+    <div className="pu-modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-label="Editar árboles plantados">
+      <div className="pu-modal" onClick={e => e.stopPropagation()}>
+        <div className="pu-modal-header">
+          <h2 className="pu-modal-title">Árboles plantados</h2>
+          <button className="pu-modal-close" onClick={onClose} aria-label="Cerrar">✕</button>
+        </div>
+        <form className="pu-modal-form" onSubmit={handleGuardar}>
+          <div className="pu-modal-field">
+            <label htmlFor="arboles-input">¿Cuántos árboles plantaste?</label>
+            <input
+              id="arboles-input"
+              type="number"
+              min={0}
+              value={arboles}
+              onChange={e => setArboles(parseInt(e.target.value, 10) || 0)}
+              placeholder="Ej: 42"
+            />
+          </div>
+          <div className="pu-modal-actions">
+            <button type="button" className="pu-modal-btn-cancel" onClick={onClose}>Cancelar</button>
+            <button type="submit" className="pu-modal-btn-save">Guardar cambios</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 // ── Modal de edición de perfil ──
 interface EditModalProps {
@@ -108,7 +118,6 @@ const EditModal: React.FC<EditModalProps> = ({ onClose }) => {
         </div>
 
         <form className="pu-modal-form" onSubmit={handleGuardar}>
-          {/* Foto de perfil */}
           <div className="pu-modal-foto-section">
             <div
               className="pu-modal-foto-preview"
@@ -195,6 +204,7 @@ const EditModal: React.FC<EditModalProps> = ({ onClose }) => {
 const PerfilUser: React.FC = () => {
   const { usuario, logout } = useAuth();
   const [modalAbierto, setModalAbierto] = useState(false);
+  const [arbolesModalAbierto, setArbolesModalAbierto] = useState(false);
 
   if (!usuario) return null;
 
@@ -249,38 +259,43 @@ const PerfilUser: React.FC = () => {
         </div>
       </section>
 
-      {/* Estadísticas */}
+      {/* Estadísticas — solo árboles plantados */}
       <section className="pu-stats">
-        <div className="pu-stat-item">
-          <span className="pu-stat-num">{usuario.publicaciones ?? 0}</span>
-          <span className="pu-stat-label">Publicaciones</span>
-        </div>
         <div className="pu-stat-item">
           <span className="pu-stat-num">{usuario.arbolesPlantados ?? 0}</span>
           <span className="pu-stat-label">Árboles plantados</span>
         </div>
-        <div className="pu-stat-item">
-          <span className="pu-stat-num">{usuario.viverosFavoritos ?? 0}</span>
-          <span className="pu-stat-label">Viveros favoritos</span>
+        <div className="pu-stat-divider" />
+        <div className="pu-stat-center">
+          <button
+            className="pu-btn-editar-stats"
+            onClick={() => setArbolesModalAbierto(true)}
+            aria-label="Editar árboles plantados"
+          >
+            editar
+          </button>
         </div>
       </section>
 
-      {/* Mis publicaciones */}
+      {/* Tu actividad */}
       <section className="pu-section">
-        <h2 className="pu-section-title">Mis publicaciones</h2>
-        <p className="pu-section-sub">Las plantaciones que subiste al corredor biológico.</p>
-        <div className="pu-grid">
-          {publicacionesMock.map(p => <TarjetaPublicacion key={p.id} item={p} />)}
-        </div>
-      </section>
-
-      {/* Viveros favoritos */}
-      <section className="pu-section">
-        <h2 className="pu-section-title">Viveros favoritos</h2>
-        <p className="pu-section-sub">Los viveros de especies nativas que guardaste.</p>
-        <div className="pu-grid">
-          {viverosMock.map(v => <TarjetaVivero key={v.id} item={v} />)}
-        </div>
+        <h2 className="pu-section-title">Tu actividad</h2>
+        {actividadMock.length === 0 ? (
+          <SinInformacion />
+        ) : (
+          <ul className="pu-actividad-list">
+            {actividadMock.map(item => (
+              <li key={item.id} className="pu-actividad-item">
+                <div className="pu-actividad-dot" aria-hidden="true" />
+                <div className="pu-actividad-body">
+                  <span className="pu-actividad-fecha">{item.fecha}</span>
+                  <p className="pu-actividad-titulo">{item.titulo}</p>
+                  <p className="pu-actividad-sub">{item.sub}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       {/* Cerrar sesión */}
@@ -288,8 +303,9 @@ const PerfilUser: React.FC = () => {
         <button className="pu-btn-logout" onClick={logout}>Cerrar sesión</button>
       </div>
 
-      {/* Modal editar */}
+      {/* Modales */}
       {modalAbierto && <EditModal onClose={() => setModalAbierto(false)} />}
+      {arbolesModalAbierto && <ArbolesModal onClose={() => setArbolesModalAbierto(false)} />}
     </div>
   );
 };
