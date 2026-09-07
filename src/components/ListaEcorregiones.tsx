@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
-import { ecorregiones } from '../data/ecorregiones';
-import type { Ecorregion } from '../data/ecorregiones';
+import React, { useState, useEffect } from 'react';
+import { obtenerEcorregiones, type Ecorregion } from '../data/ecorregiones';
 import './ListaEcorregiones.css';
 
 const ListaEcorregiones: React.FC = () => {
+  const [ecorregiones, setEcorregiones] = useState<Ecorregion[]>([]);
   const [activa, setActiva] = useState<Ecorregion | null>(null);
 
+  useEffect(() => {
+    obtenerEcorregiones().then((data) => setEcorregiones(data));
+  }, []);
+
   const handleClick = (eco: Ecorregion) => {
-    setActiva(activa?.id === eco.id ? null : eco);
+    setActiva((prev) => (prev?.id === eco.id ? null : eco));
   };
 
   return (
@@ -33,7 +37,6 @@ const ListaEcorregiones: React.FC = () => {
                 <p className="eco-detalle-resumen">{eco.resumen}</p>
                 <div className="eco-detalle-tags">
                   <span className="eco-tag">{eco.bioma}</span>
-                  <span className="eco-tag">{eco.superficie}</span>
                 </div>
               </div>
             )}
