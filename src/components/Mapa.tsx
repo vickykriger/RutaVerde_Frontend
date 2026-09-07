@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import api from '../../api.js';
+import type { Ecorregion } from '../data/ecorregiones';
 import 'leaflet/dist/leaflet.css';
 import './Mapa.css';
 
@@ -22,15 +23,17 @@ const FitBoundsHelper = ({ geoJsonData }: { geoJsonData: any }) => {
 
   return null;
 };
+interface MapaProps {
+  onSeleccionarRegion?: (region: Ecorregion) => void;
+}
 
-const Mapa: React.FC = () => {
+const MapaComponente: React.FC<MapaProps> = ({ onSeleccionarRegion }) => {
   const [geoJsonData, setGeoJsonData] = useState<any>(null);
 
   useEffect(() => {
     const cargarEcorregiones = async () => {
       try {
         const respuesta = await api.get('/api/ecorregiones');
-        console.log('¡Ecorregiones recibidas desde el Backend!', respuesta.data);
         setGeoJsonData(respuesta.data);
       } catch (error) {
         console.error('Error al solicitar ecorregiones al Backend:', error);
@@ -39,6 +42,17 @@ const Mapa: React.FC = () => {
 
     cargarEcorregiones();
   }, []);
+
+  const onEachFeature = (feature: any, layer: any) => {
+  layer.on({
+    click: () => {
+      console.log('🔍 PROPIEDADES REALES DEL MAPA:', feature.properties);
+      if (onSeleccionarRegion) {
+        onSeleccionarRegion(feature.properties);
+      }
+    },
+  });
+};
 
   const estiloEcorregiones = {
     color: '#2c3e50',
@@ -66,7 +80,12 @@ const Mapa: React.FC = () => {
 
         {geoJsonData && (
           <>
-            <GeoJSON data={geoJsonData} style={estiloEcorregiones} />
+            <GeoJSON 
+              key={JSON.stringify(geoJsonData.length)} 
+              data={geoJsonData} 
+              style={estiloEcorregiones} 
+              onEachFeature={onEachFeature} 
+            />
             <FitBoundsHelper geoJsonData={geoJsonData} />
           </>
         )}
@@ -75,4 +94,4 @@ const Mapa: React.FC = () => {
   );
 };
 
-export default Mapa;
+export default MapaComponente;

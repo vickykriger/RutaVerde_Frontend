@@ -1,9 +1,13 @@
+import React, { useState } from 'react';
 import Header from '../components/Header';
 import MapaComponente from '../components/Mapa';
 import ListaEcorregiones from '../components/ListaEcorregiones';
+import type { Ecorregion } from '../data/ecorregiones';
 import '../components/MapaPage.css';
 
 export default function Mapa() {
+  const [regionSeleccionada, setRegionSeleccionada] = useState<Ecorregion | null>(null);
+
   return (
     <>
       <Header />
@@ -12,17 +16,16 @@ export default function Mapa() {
           {/* Lado izquierdo: mapa */}
           <div className="mapa-izquierda">
             <div className="mapa-placeholder">
-              <MapaComponente />
+              <MapaComponente onSeleccionarRegion={setRegionSeleccionada} />
             </div>
           </div>
 
           {/* Lado derecho: lista de ecorregiones */}
           <div className="mapa-derecha">
-            <ListaEcorregiones />
+            <ListaEcorregiones regionSeleccionada={regionSeleccionada} />
           </div>
         </div>
       </main>
-
     </>
   );
 }
