@@ -16,7 +16,6 @@ export async function obtenerEcorregiones(): Promise<Ecorregion[]> {
 
     const data = await response.json();
 
-    // Mapeo defensivo para asegurar que los campos coincidan con la interfaz
     return data.map((item: any, index: number) => ({
       id: item.id || item.id_region || index + 1,
       nombre: item.nombre || '',
