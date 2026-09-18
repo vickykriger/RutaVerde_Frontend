@@ -15,9 +15,7 @@ export default function Mapa() {
         <div className="mapa-layout">
           {/* Lado izquierdo: mapa */}
           <div className="mapa-izquierda">
-            <div className="mapa-placeholder">
               <MapaComponente onSeleccionarRegion={setRegionSeleccionada} />
-            </div>
           </div>
 
           {/* Lado derecho: lista de ecorregiones */}

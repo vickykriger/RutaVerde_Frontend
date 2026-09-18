@@ -4,6 +4,7 @@ export interface Ecorregion {
   paises: string;
   resumen: string;
   bioma: string;
+  contribuciones: number;
 }
 
 export async function obtenerEcorregiones(): Promise<Ecorregion[]> {
@@ -21,7 +22,8 @@ export async function obtenerEcorregiones(): Promise<Ecorregion[]> {
       nombre: item.nombre || '',
       paises: item.paises || 'América Latina',
       resumen: item.resumen || item.descripcion || 'Sin descripción disponible.',
-      bioma: item.bioma || 'Ecorregión'
+      bioma: item.bioma || 'Ecorregión',
+      contribuciones: item.contribuciones || 0
     }));
   } catch (error) {
     console.error('❌ Error al conectar con /api/ecoregiones:', error);
