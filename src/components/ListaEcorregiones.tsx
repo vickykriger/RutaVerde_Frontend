@@ -87,6 +87,7 @@ const ListaEcorregiones: React.FC<ListaProps> = ({ regionSeleccionada }) => {
               <p className="eco-detalle-resumen">{eco.resumen}</p>
               <div className="eco-detalle-tags">
                 <span className="eco-tag">{eco.bioma}</span>
+                <span className="eco-tag">{eco.contribuciones} Arboles plantados</span>
               </div>
             </div>
           )}

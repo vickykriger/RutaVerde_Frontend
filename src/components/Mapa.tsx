@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import api from '../../api.js';
-import type { Ecorregion } from '../data/ecorregiones';
+import { obtenerEcorregiones, type Ecorregion } from '../data/ecorregiones';
 import 'leaflet/dist/leaflet.css';
 import './Mapa.css';
 
-const limitesAmericas = L.latLngBounds(
-  L.latLng(-58, -170),
-  L.latLng(75, -25)
+const limitesVerticales = L.latLngBounds(
+  L.latLng(-60, -180),
+  L.latLng(15, 180) 
 );
 
 const FitBoundsHelper = ({ geoJsonData }: { geoJsonData: any }) => {
@@ -23,6 +23,7 @@ const FitBoundsHelper = ({ geoJsonData }: { geoJsonData: any }) => {
 
   return null;
 };
+
 interface MapaProps {
   onSeleccionarRegion?: (region: Ecorregion) => void;
 }
@@ -31,34 +32,96 @@ const MapaComponente: React.FC<MapaProps> = ({ onSeleccionarRegion }) => {
   const [geoJsonData, setGeoJsonData] = useState<any>(null);
 
   useEffect(() => {
-    const cargarEcorregiones = async () => {
+    const cargarYCombinarDatos = async () => {
       try {
-        const respuesta = await api.get('/api/ecorregiones');
-        setGeoJsonData(respuesta.data);
+        // 1. Cargar las ecorregiones con las contribuciones procesadas desde data/ecorregiones.ts
+        const listaEcorregiones = await obtenerEcorregiones();
+
+        // 2. Cargar el GeoJSON de geometrías desde la API
+        const respuestaGeoJson = await api.get('/api/ecorregiones');
+        const rawGeoJson = respuestaGeoJson.data;
+
+        // 3. Fusionar la propiedad 'contribuciones' en feature.properties de cada polígono
+        if (rawGeoJson && rawGeoJson.features) {
+          const geoJsonEnriquecido = {
+            ...rawGeoJson,
+            features: rawGeoJson.features.map((feature: any) => {
+              const props = feature.properties || {};
+              const nombreMapa = props.NOMBRE || props.ECO_NAME || props.nombre || '';
+
+              const regionDb = listaEcorregiones.find(
+                (item) => item.nombre.toLowerCase().trim() === nombreMapa.toLowerCase().trim()
+              );
+
+              return {
+                ...feature,
+                properties: {
+                  ...props,
+                  contribuciones: regionDb ? regionDb.contribuciones : 0,
+                },
+              };
+            }),
+          };
+
+          setGeoJsonData(geoJsonEnriquecido);
+        } else {
+          setGeoJsonData(rawGeoJson);
+        }
       } catch (error) {
-        console.error('Error al solicitar ecorregiones al Backend:', error);
+        console.error('Error al cargar ecorregiones y GeoJSON:', error);
       }
     };
 
-    cargarEcorregiones();
+    cargarYCombinarDatos();
   }, []);
 
-  const onEachFeature = (feature: any, layer: any) => {
-  layer.on({
-    click: () => {
-      console.log('🔍 PROPIEDADES REALES DEL MAPA:', feature.properties);
-      if (onSeleccionarRegion) {
-        onSeleccionarRegion(feature.properties);
-      }
-    },
-  });
-};
+  const obtenerColorPorContribuciones = (contribuciones: number = 0): string => {
+    if (contribuciones >= 14) return '#21330A';
+    if (contribuciones >= 13) return '#324E11';
+    if (contribuciones >= 12) return '#416718';
+    if (contribuciones >= 11) return '#487212';
+    if (contribuciones >= 10) return '#568715';
+    if (contribuciones >= 9) return '#639C19';
+    if (contribuciones >= 8) return '#72B11D';
+    if (contribuciones >= 7) return '#8FBE3C';
+    if (contribuciones >= 6) return '#A0C958';
+    if (contribuciones >= 5) return '#AFD374';
+    if (contribuciones >= 4) return '#BDDC8F';
+    if (contribuciones >= 3) return '#CCE5AA';
+    if (contribuciones >= 2) return '#DCEDC4';
+    if (contribuciones >= 1) return '#EAF4DC';
+    return '#F5FAF0';
+  };
 
-  const estiloEcorregiones = {
-    color: '#2c3e50',
-    weight: 1.5,
-    fillColor: '#73b324',
-    fillOpacity: 0.4,
+  const estiloEcorregiones = (feature: any) => {
+    const cantidadContribuciones = feature?.properties?.contribuciones || 0;
+
+    return {
+      color: '#1e293b',
+      weight: 1.2,
+      fillColor: obtenerColorPorContribuciones(cantidadContribuciones),
+      fillOpacity: 0.7,
+    };
+  };
+
+  const onEachFeature = (feature: any, layer: any) => {
+    layer.on({
+      click: () => {
+        const props = feature.properties || {};
+        console.log('🔍 PROPIEDADES REALES DEL MAPA:', props.contribuciones);
+
+        if (onSeleccionarRegion) {
+          onSeleccionarRegion({
+            id: props.id || props.id_region,
+            nombre: props.nombre || props.NOMBRE,
+            paises: props.paises || props.COUNTRY || 'América Latina',
+            resumen: props.descripcion || props.resumen || 'Sin descripción disponible.',
+            bioma: props.bioma || 'Ecorregión',
+            contribuciones: props.contribuciones || 0,
+          });
+        }
+      },
+    });
   };
 
   return (
@@ -66,25 +129,24 @@ const MapaComponente: React.FC<MapaProps> = ({ onSeleccionarRegion }) => {
       <MapContainer
         center={[-15, -60]}
         zoom={3}
-        minZoom={3}
-        maxBounds={limitesAmericas}
-        maxBoundsViscosity={1.0}
+        maxBounds={limitesVerticales}
+        minZoom={2}
+        worldCopyJump={true} 
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
           maxZoom={19}
-          bounds={limitesAmericas}
           attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         />
 
         {geoJsonData && (
           <>
-            <GeoJSON 
-              key={JSON.stringify(geoJsonData.length)} 
-              data={geoJsonData} 
-              style={estiloEcorregiones} 
-              onEachFeature={onEachFeature} 
+            <GeoJSON
+              key={JSON.stringify(geoJsonData)}
+              data={geoJsonData}
+              style={estiloEcorregiones}
+              onEachFeature={onEachFeature}
             />
             <FitBoundsHelper geoJsonData={geoJsonData} />
           </>
