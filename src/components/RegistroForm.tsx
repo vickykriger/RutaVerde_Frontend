@@ -14,10 +14,11 @@ const RegistroForm: React.FC<RegistroFormProps> = ({ onLoginClick }) => {
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [contrasenia, setContrasenia] = useState('');
+  const [repetirContrasenia, setRepetirContrasenia] = useState('');
   const [region, setRegion] = useState('');
   const [error, setError] = useState('');
   const [camposError, setCamposError] = useState<{
-    nombre?: boolean; email?: boolean; contrasenia?: boolean; region?: boolean;
+    nombre?: boolean; email?: boolean; contrasenia?: boolean; repetirContrasenia?: boolean; region?: boolean;
   }>({});
 
   const limpiarCampo = (campo: string) =>
@@ -32,11 +33,19 @@ const RegistroForm: React.FC<RegistroFormProps> = ({ onLoginClick }) => {
     if (!nombre.trim()) errores.nombre = true;
     if (!email.trim()) errores.email = true;
     if (!contrasenia.trim()) errores.contrasenia = true;
+    if (!repetirContrasenia.trim()) errores.repetirContrasenia = true;
     if (!region) errores.region = true;
 
     if (Object.keys(errores).length > 0) {
       setCamposError(errores);
       setError('Por favor, completá todos los campos.');
+      return;
+    }
+
+    // Validación de coincidencia de contraseñas
+    if (contrasenia !== repetirContrasenia) {
+      setCamposError({ contrasenia: true, repetirContrasenia: true });
+      setError('Las contraseñas no coinciden.');
       return;
     }
 
@@ -56,7 +65,6 @@ const RegistroForm: React.FC<RegistroFormProps> = ({ onLoginClick }) => {
 
       if (respuesta.data.error) {
         setError(respuesta.data.error);
-        // Si el email ya existe suele ser el campo en cuestión
         if (respuesta.data.error.toLowerCase().includes('email') || respuesta.data.error.toLowerCase().includes('correo')) {
           setCamposError({ email: true });
         }
@@ -78,10 +86,10 @@ const RegistroForm: React.FC<RegistroFormProps> = ({ onLoginClick }) => {
         setCamposError({ email: true });
       } else if (msg.toLowerCase().includes('contraseña') || msg.toLowerCase().includes('password')) {
         setError(msg || 'La contraseña no cumple los requisitos.');
-        setCamposError({ contrasenia: true });
+        setCamposError({ contrasenia: true, repetirContrasenia: true });
       } else {
         setError(msg || 'Hubo un problema al crear tu cuenta. Intentá de nuevo.');
-        setCamposError({ nombre: true, email: true, contrasenia: true, region: true });
+        setCamposError({ nombre: true, email: true, contrasenia: true, repetirContrasenia: true, region: true });
       }
     }
   };
@@ -129,6 +137,18 @@ const RegistroForm: React.FC<RegistroFormProps> = ({ onLoginClick }) => {
               value={contrasenia}
               className={camposError.contrasenia ? 'input-error' : ''}
               onChange={(e) => { setContrasenia(e.target.value); limpiarCampo('contrasenia'); }}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="repeat-password">Repetir contraseña</label>
+            <input 
+              type="password" 
+              id="repeat-password" 
+              placeholder="Reingresá tu contraseña" 
+              value={repetirContrasenia}
+              className={camposError.repetirContrasenia ? 'input-error' : ''}
+              onChange={(e) => { setRepetirContrasenia(e.target.value); limpiarCampo('repetirContrasenia'); }}
             />
           </div>
 
