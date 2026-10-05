@@ -7,7 +7,9 @@ interface SubirNoticiaModalProps {
 const SubirNoticiaModal: React.FC<SubirNoticiaModalProps> = ({ onClose }) => {
   const fotoInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({ titulo: '', contenido: '', foto: '' });
+  const [archivoFoto, setArchivoFoto] = useState<File | null>(null); // Pasa el archivo binario al backend
   const [enviado, setEnviado] = useState(false);
+  const [cargando, setCargando] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -15,14 +17,48 @@ const SubirNoticiaModal: React.FC<SubirNoticiaModalProps> = ({ onClose }) => {
   const handleFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    setArchivoFoto(file); // Guarda el archivo para Multer
+
     const reader = new FileReader();
     reader.onloadend = () => setForm(prev => ({ ...prev, foto: reader.result as string }));
     reader.readAsDataURL(file);
   };
 
-  const handlePublicar = (e: React.FormEvent) => {
+  const handlePublicar = async (e: React.FormEvent) => {
     e.preventDefault();
-    setEnviado(true);
+
+    if (!archivoFoto) {
+      alert('Por favor elegí una imagen de portada');
+      return;
+    }
+
+    try {
+      setCargando(true);
+
+      const formData = new FormData();
+      formData.append('titulo', form.titulo);
+      formData.append('contenido', form.contenido);
+      formData.append('foto', archivoFoto);
+
+      // Usa 127.0.0.1 para evitar bloqueos de IPv6/localhost
+      const res = await fetch('http://127.0.0.1:5000/api/Noticias', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (res.ok) {
+        setEnviado(true);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        alert('Error al publicar: ' + (errData.error || 'Verificá el backend'));
+      }
+    } catch (err) {
+      console.error(err);
+      alert('No se pudo conectar con el servidor. Revisá que Node.js esté corriendo.');
+    } finally {
+      setCargando(false);
+    }
   };
 
   return (
@@ -74,7 +110,9 @@ const SubirNoticiaModal: React.FC<SubirNoticiaModalProps> = ({ onClose }) => {
             </div>
 
             <div className="pu-publicar-wrap">
-              <button type="submit" className="pu-btn-publicar">Publicar</button>
+              <button type="submit" className="pu-btn-publicar" disabled={cargando}>
+                {cargando ? 'Publicando...' : 'Publicar'}
+              </button>
               <p className="pu-publicar-aviso">Una vez la noticia fue enviada, deberá ser aprobada por Ruta Verde para aparecer en el newsletter general.</p>
             </div>
           </form>
