@@ -15,12 +15,6 @@ const Inicio: React.FC = () => {
           </p>
           <button className="btn-explorar" onClick={() => navigate('/mapa')}>Explorar mapa</button>
         </div>
-        <div className="inicio-map-container">
-          <div className="map-wrapper">
-             {/* Representación visual del mapa de la imagen */}
-             <img src="{{DATA:IMAGE:IMAGE_1}}" alt="Mapa de corredor biológico" className="map-image" />
-          </div>
-        </div>
       </div>
     </section>
   );

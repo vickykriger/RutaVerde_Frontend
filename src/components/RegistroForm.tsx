@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import api from '../../api.js';
 import './RegistroForm.css';
 import { useAuth } from '../context/AuthContext';
@@ -52,7 +52,7 @@ const RegistroForm: React.FC = () => {
     setCamposError({});
 
     try {
-      let idRegionNum = 1; 
+      let idRegionNum = 1;
       if (region === 'chorotega') idRegionNum = 2;
       if (region === 'brunca') idRegionNum = 3;
 
@@ -60,7 +60,7 @@ const RegistroForm: React.FC = () => {
         nombre,
         email,
         contrasenia,
-        region: idRegionNum 
+        region: idRegionNum
       });
 
       if (respuesta.data.error) {
@@ -99,18 +99,18 @@ const RegistroForm: React.FC = () => {
       <div className="registro-card">
         <h1 className="registro-title">Crear cuenta</h1>
         <p className="registro-subtitle">Sumáte al corredor biológico</p>
-        
+
         <hr className="divider" />
 
         <form className="registro-form" onSubmit={manejarRegistro}>
           {error && <p className="form-error-banner">{error}</p>}
-          
+
           <div className="form-group">
             <label htmlFor="nombre">Nombre completo</label>
-            <input 
-              type="text" 
-              id="nombre" 
-              placeholder="Tu nombre y apellido" 
+            <input
+              type="text"
+              id="nombre"
+              placeholder="Tu nombre y apellido"
               value={nombre}
               className={camposError.nombre ? 'input-error' : ''}
               onChange={(e) => { setNombre(e.target.value); limpiarCampo('nombre'); }}
@@ -119,26 +119,25 @@ const RegistroForm: React.FC = () => {
 
           <div className="form-group">
             <label htmlFor="email">Correo electrónico</label>
-            <input 
-              type="email" 
-              id="email" 
-              placeholder="correo@ejemplo.com" 
+            <input
+              type="email"
+              id="email"
+              placeholder="correo@ejemplo.com"
               value={email}
               className={camposError.email ? 'input-error' : ''}
               onChange={(e) => { setEmail(e.target.value); limpiarCampo('email'); }}
             />
           </div>
 
-          {/* Campo Contraseña con Ojo */}
+          {/* Campo Contraseña */}
           <div className="form-group">
             <label htmlFor="password">Contraseña</label>
-            <div className="password-input-wrapper">
-              <input 
-                type={mostrarContrasenia ? 'text' : 'password'} 
-                id="password" 
-                placeholder="Mínimo 8 caracteres" 
+            <div className={`password-input-wrapper ${camposError.contrasenia ? 'input-error' : ''}`}>
+              <input
+                type={mostrarContrasenia ? 'text' : 'password'}
+                id="password"
+                placeholder="Mínimo 8 caracteres"
                 value={contrasenia}
-                className={camposError.contrasenia ? 'input-error' : ''}
                 onChange={(e) => { setContrasenia(e.target.value); limpiarCampo('contrasenia'); }}
               />
               <button
@@ -152,16 +151,15 @@ const RegistroForm: React.FC = () => {
             </div>
           </div>
 
-          {/* Campo Repetir Contraseña con Ojo */}
+          {/* Campo Repetir Contraseña */}
           <div className="form-group">
             <label htmlFor="repeat-password">Repetir contraseña</label>
-            <div className="password-input-wrapper">
-              <input 
-                type={mostrarRepetirContrasenia ? 'text' : 'password'} 
-                id="repeat-password" 
-                placeholder="Reingresá tu contraseña" 
+            <div className={`password-input-wrapper ${camposError.repetirContrasenia ? 'input-error' : ''}`}>
+              <input
+                type={mostrarRepetirContrasenia ? 'text' : 'password'}
+                id="repeat-password"
+                placeholder="Reingresá tu contraseña"
                 value={repetirContrasenia}
-                className={camposError.repetirContrasenia ? 'input-error' : ''}
                 onChange={(e) => { setRepetirContrasenia(e.target.value); limpiarCampo('repetirContrasenia'); }}
               />
               <button
@@ -177,9 +175,9 @@ const RegistroForm: React.FC = () => {
 
           <div className="form-group">
             <label htmlFor="region">Región</label>
-            <select 
-              id="region" 
-              value={region} 
+            <select
+              id="region"
+              value={region}
               className={camposError.region ? 'input-error' : ''}
               onChange={(e) => { setRegion(e.target.value); limpiarCampo('region'); }}
             >
@@ -194,8 +192,8 @@ const RegistroForm: React.FC = () => {
         </form>
 
         <div className="registro-footer">
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={() => navigate('/ingresar')}
             className="login-link"
             style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', textDecoration: 'underline' }}
