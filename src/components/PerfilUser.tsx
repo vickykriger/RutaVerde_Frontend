@@ -18,7 +18,6 @@ const EditModal: React.FC<EditModalProps> = ({ onClose }) => {
     apellido: usuario?.apellido ?? '',
     usuario: usuario?.usuario ?? '',
     email: usuario?.email ?? '',
-    descripcion: usuario?.descripcion ?? '',
     ubicacion: usuario?.ubicacion ?? '',
     primerArbol: usuario?.primerArbol ?? '',
     fotoPerfil: usuario?.fotoPerfil ?? '',
@@ -57,7 +56,6 @@ const EditModal: React.FC<EditModalProps> = ({ onClose }) => {
           <div className="pu-modal-field"><label>Nombre</label><input name="nombre" type="text" value={form.nombre} onChange={handleChange} placeholder="Tu nombre" /></div>
           <div className="pu-modal-field"><label>Usuario</label><input name="usuario" type="text" value={form.usuario} onChange={handleChange} placeholder="@tuusuario" /></div>
           <div className="pu-modal-field"><label>Mail</label><input name="email" type="email" value={form.email} onChange={handleChange} placeholder="correo@ejemplo.com" /></div>
-          <div className="pu-modal-field"><label>Descripción</label><textarea name="descripcion" value={form.descripcion} onChange={handleChange} placeholder="Contá algo sobre vos..." rows={3} /></div>
           <div className="pu-modal-field"><label>Ubicación</label><input name="ubicacion" type="text" value={form.ubicacion} onChange={handleChange} placeholder="Ciudad, Provincia" /></div>
           <div className="pu-modal-field"><label>¿Cuándo plantaste tu primer árbol?</label><input name="primerArbol" type="text" value={form.primerArbol} onChange={handleChange} placeholder="Ej: Marzo 2023" /></div>
           <div className="pu-modal-actions">
