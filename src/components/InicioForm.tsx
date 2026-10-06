@@ -15,6 +15,9 @@ const InicioForm: React.FC<InicioFormProps> = ({ onRegisterClick }) => {
   const [contrasenia, setContrasenia] = useState('');
   const [error, setError] = useState('');
   const [camposError, setCamposError] = useState<{ email?: boolean; contrasenia?: boolean }>({});
+  
+  // Estado para controlar la visibilidad de la contraseña
+  const [mostrarContrasenia, setMostrarContrasenia] = useState(false);
 
   const manejarLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,17 +90,28 @@ const InicioForm: React.FC<InicioFormProps> = ({ onRegisterClick }) => {
             />
           </div>
 
+          {/* Campo Contraseña con Ojo */}
           <div className="form-group">
             <label htmlFor="password">Contraseña</label>
-            <input
-              type="password"
-              id="password"
-              placeholder="contraseña"
-              autoComplete="current-password"
-              value={contrasenia}
-              className={camposError.contrasenia ? 'input-error' : ''}
-              onChange={(e) => { setContrasenia(e.target.value); setCamposError(p => ({ ...p, contrasenia: false })); }}
-            />
+            <div className="password-input-wrapper">
+              <input
+                type={mostrarContrasenia ? 'text' : 'password'}
+                id="password"
+                placeholder="contraseña"
+                autoComplete="current-password"
+                value={contrasenia}
+                className={camposError.contrasenia ? 'input-error' : ''}
+                onChange={(e) => { setContrasenia(e.target.value); setCamposError(p => ({ ...p, contrasenia: false })); }}
+              />
+              <button
+                type="button"
+                className="btn-toggle-password"
+                onClick={() => setMostrarContrasenia(!mostrarContrasenia)}
+                aria-label={mostrarContrasenia ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {mostrarContrasenia ? '👁️' : '🙈'}
+              </button>
+            </div>
           </div>
 
           <div className="forgot-password">

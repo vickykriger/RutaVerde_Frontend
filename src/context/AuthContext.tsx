@@ -42,8 +42,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
-    setUsuario(null);
-    window.localStorage.removeItem(STORAGE_KEY);
+    const seguro = window.confirm("¿Estás seguro de que deseas eliminar este elemento?");
+    if (seguro) {
+        setUsuario(null);
+        window.localStorage.removeItem(STORAGE_KEY);
+        console.log("Elemento eliminado");
+    } else {
+      console.log("Acción cancelada");
+    }
+    
   };
 
   const updateUsuario = (datos: Partial<Usuario>) => {

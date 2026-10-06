@@ -4,10 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import { noticias } from '../data/noticias';
 import type { Noticia } from '../data/noticias';
 import NoticiaModal from './NoticiaModal';
-import SubirNoticiaModal from './SubirNoticiaModal'; // 👈 Importación del nuevo componente
+import SubirNoticiaModal from './SubirNoticiaModal';
 import './PerfilUser.css';
 
-// ── Modal editar perfil ──
 interface EditModalProps { onClose: () => void; }
 
 const EditModal: React.FC<EditModalProps> = ({ onClose }) => {
@@ -55,10 +54,7 @@ const EditModal: React.FC<EditModalProps> = ({ onClose }) => {
             </div>
             <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFotoChange} />
           </div>
-          <div className="pu-modal-row">
-            <div className="pu-modal-field"><label>Nombre</label><input name="nombre" type="text" value={form.nombre} onChange={handleChange} placeholder="Tu nombre" /></div>
-            <div className="pu-modal-field"><label>Apellido</label><input name="apellido" type="text" value={form.apellido} onChange={handleChange} placeholder="Tu apellido" /></div>
-          </div>
+          <div className="pu-modal-field"><label>Nombre</label><input name="nombre" type="text" value={form.nombre} onChange={handleChange} placeholder="Tu nombre" /></div>
           <div className="pu-modal-field"><label>Usuario</label><input name="usuario" type="text" value={form.usuario} onChange={handleChange} placeholder="@tuusuario" /></div>
           <div className="pu-modal-field"><label>Mail</label><input name="email" type="email" value={form.email} onChange={handleChange} placeholder="correo@ejemplo.com" /></div>
           <div className="pu-modal-field"><label>Descripción</label><textarea name="descripcion" value={form.descripcion} onChange={handleChange} placeholder="Contá algo sobre vos..." rows={3} /></div>
@@ -124,12 +120,10 @@ const PerfilUser: React.FC = () => {
 
         {/* Info */}
         <h1 className="pu-nombre">{nombre}</h1>
-        <p className="pu-handle">{handle} · Se unió en {desde}</p>
         {usuario.descripcion && <p className="pu-descripcion">{usuario.descripcion}</p>}
         <div className="pu-meta">
           {usuario.ubicacion && <span className="pu-meta-item">📍 {usuario.ubicacion}</span>}
           {usuario.email && <span className="pu-meta-item">✉️ {usuario.email}</span>}
-          {usuario.primerArbol && <span className="pu-meta-item">🌱 Voluntaria desde {usuario.primerArbol}</span>}
         </div>
 
         {/* ── Subir noticia ── */}

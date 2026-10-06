@@ -17,6 +17,10 @@ const RegistroForm: React.FC = () => {
     nombre?: boolean; email?: boolean; contrasenia?: boolean; repetirContrasenia?: boolean; region?: boolean;
   }>({});
 
+  // Estados para controlar la visibilidad de las contraseñas
+  const [mostrarContrasenia, setMostrarContrasenia] = useState(false);
+  const [mostrarRepetirContrasenia, setMostrarRepetirContrasenia] = useState(false);
+
   const limpiarCampo = (campo: string) =>
     setCamposError(p => ({ ...p, [campo]: false }));
 
@@ -100,6 +104,7 @@ const RegistroForm: React.FC = () => {
 
         <form className="registro-form" onSubmit={manejarRegistro}>
           {error && <p className="form-error-banner">{error}</p>}
+          
           <div className="form-group">
             <label htmlFor="nombre">Nombre completo</label>
             <input 
@@ -124,28 +129,50 @@ const RegistroForm: React.FC = () => {
             />
           </div>
 
+          {/* Campo Contraseña con Ojo */}
           <div className="form-group">
             <label htmlFor="password">Contraseña</label>
-            <input 
-              type="password" 
-              id="password" 
-              placeholder="Mínimo 8 caracteres" 
-              value={contrasenia}
-              className={camposError.contrasenia ? 'input-error' : ''}
-              onChange={(e) => { setContrasenia(e.target.value); limpiarCampo('contrasenia'); }}
-            />
+            <div className="password-input-wrapper">
+              <input 
+                type={mostrarContrasenia ? 'text' : 'password'} 
+                id="password" 
+                placeholder="Mínimo 8 caracteres" 
+                value={contrasenia}
+                className={camposError.contrasenia ? 'input-error' : ''}
+                onChange={(e) => { setContrasenia(e.target.value); limpiarCampo('contrasenia'); }}
+              />
+              <button
+                type="button"
+                className="btn-toggle-password"
+                onClick={() => setMostrarContrasenia(!mostrarContrasenia)}
+                aria-label={mostrarContrasenia ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {mostrarContrasenia ? '👁️' : '🙈'}
+              </button>
+            </div>
           </div>
 
+          {/* Campo Repetir Contraseña con Ojo */}
           <div className="form-group">
             <label htmlFor="repeat-password">Repetir contraseña</label>
-            <input 
-              type="password" 
-              id="repeat-password" 
-              placeholder="Reingresá tu contraseña" 
-              value={repetirContrasenia}
-              className={camposError.repetirContrasenia ? 'input-error' : ''}
-              onChange={(e) => { setRepetirContrasenia(e.target.value); limpiarCampo('repetirContrasenia'); }}
-            />
+            <div className="password-input-wrapper">
+              <input 
+                type={mostrarRepetirContrasenia ? 'text' : 'password'} 
+                id="repeat-password" 
+                placeholder="Reingresá tu contraseña" 
+                value={repetirContrasenia}
+                className={camposError.repetirContrasenia ? 'input-error' : ''}
+                onChange={(e) => { setRepetirContrasenia(e.target.value); limpiarCampo('repetirContrasenia'); }}
+              />
+              <button
+                type="button"
+                className="btn-toggle-password"
+                onClick={() => setMostrarRepetirContrasenia(!mostrarRepetirContrasenia)}
+                aria-label={mostrarRepetirContrasenia ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {mostrarRepetirContrasenia ? '👁️' : '🙈'}
+              </button>
+            </div>
           </div>
 
           <div className="form-group">
