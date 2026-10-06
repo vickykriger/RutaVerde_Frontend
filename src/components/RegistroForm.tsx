@@ -4,11 +4,7 @@ import api from '../../api.js';
 import './RegistroForm.css';
 import { useAuth } from '../context/AuthContext';
 
-interface RegistroFormProps {
-  onLoginClick?: () => void;
-}
-
-const RegistroForm: React.FC<RegistroFormProps> = ({ onLoginClick }) => {
+const RegistroForm: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [nombre, setNombre] = useState('');

@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+
 import Landing from './pages/Landing';
 import Historia from './pages/Historia';
 import Aportes from './pages/Aportes';
@@ -9,11 +9,12 @@ import Perfil from './pages/Perfil';
 import InicioForm from './components/InicioForm';
 import RegistroForm from './components/RegistroForm';
 import Footer from './components/Footer';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
+    <AuthProvider>
+      <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/mapa" element={<MapaPage />} />
@@ -25,8 +26,8 @@ function App() {
           <Route path="/perfil" element={<Perfil />} />
         </Routes>
         <Footer />
-      </AuthProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
