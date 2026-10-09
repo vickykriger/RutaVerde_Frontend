@@ -1,16 +1,15 @@
 import { createContext, useContext, useMemo, useState } from 'react';
 
+// Interfaz alineada exactamente con la tabla "Usuarios" de la BD
 export interface Usuario {
-  id: number;
-  nombre: string;
-  apellido?: string;
+  id_usuario: number;
+  nombreC: string;
   email: string;
-  usuario?: string;
+  contrasena?: string;
+  fechaR?: string;
+  id_rol?: number;
+  id_region?: number;
   fotoPerfil?: string;
-  descripcion?: string;
-  ubicacion?: string;
-  primerArbol?: string;
-  fechaUnion?: string;
   [key: string]: any;
 }
 
@@ -42,15 +41,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
-    const seguro = window.confirm("¿Estás seguro de que deseas eliminar este elemento?");
+    const seguro = window.confirm("¿Estás seguro de que deseas cerrar sesión?");
     if (seguro) {
-        setUsuario(null);
-        window.localStorage.removeItem(STORAGE_KEY);
-        console.log("Elemento eliminado");
+      setUsuario(null);
+      window.localStorage.removeItem(STORAGE_KEY);
+      console.log("Sesión cerrada correctamente");
     } else {
       console.log("Acción cancelada");
     }
-    
   };
 
   const updateUsuario = (datos: Partial<Usuario>) => {

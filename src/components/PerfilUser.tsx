@@ -5,6 +5,7 @@ import { noticias } from '../data/noticias';
 import type { Noticia } from '../data/noticias';
 import NoticiaModal from './NoticiaModal';
 import SubirNoticiaModal from './SubirNoticiaModal';
+import api from '../../api';
 import './PerfilUser.css';
 
 interface EditModalProps { onClose: () => void; }
@@ -12,15 +13,15 @@ interface EditModalProps { onClose: () => void; }
 const EditModal: React.FC<EditModalProps> = ({ onClose }) => {
   const { usuario, updateUsuario } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [archivoFoto, setArchivoFoto] = useState<File | null>(null);
+
+  // Extraemos los datos reales soportando usuario.data o usuario directo
+  const datosUsuario = usuario?.data || usuario;
 
   const [form, setForm] = useState({
-    nombre: usuario?.nombre ?? '',
-    apellido: usuario?.apellido ?? '',
-    usuario: usuario?.usuario ?? '',
-    email: usuario?.email ?? '',
-    ubicacion: usuario?.ubicacion ?? '',
-    primerArbol: usuario?.primerArbol ?? '',
-    fotoPerfil: usuario?.fotoPerfil ?? '',
+    nombre: datosUsuario?.nombreC || datosUsuario?.nombre || '',
+    ubicacion: datosUsuario?.ubicacion || '',
+    fotoPerfil: datosUsuario?.fotoPerfil || '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -29,12 +30,74 @@ const EditModal: React.FC<EditModalProps> = ({ onClose }) => {
   const handleFotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    setArchivoFoto(file);
+
     const reader = new FileReader();
     reader.onloadend = () => setForm(prev => ({ ...prev, fotoPerfil: reader.result as string }));
     reader.readAsDataURL(file);
   };
 
-  const handleGuardar = (e: React.FormEvent) => { e.preventDefault(); updateUsuario(form); onClose(); };
+const handleGuardar = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  try {
+    const idUsuario = datosUsuario?.id_usuario || datosUsuario?.id;
+
+    if (!idUsuario) {
+      alert('Error: No se encontró la sesión del usuario.');
+      return;
+    }
+
+    let nuevoNombreC = datosUsuario?.nombreC || datosUsuario?.nombre;
+    let nuevaFoto = datosUsuario?.fotoPerfil;
+
+    const nombreForm = form.nombre.trim();
+    const nombreActual = (datosUsuario?.nombreC || datosUsuario?.nombre || '').trim();
+
+    if (nombreForm && nombreForm !== nombreActual) {
+      const resNombre = await api.put('/api/perfil/nombre', {
+        id_usuario: Number(idUsuario),
+        nombre: nombreForm
+      });
+
+      if (resNombre.data?.nombre) {
+        nuevoNombreC = resNombre.data.nombre;
+      }
+    }
+
+    if (archivoFoto) {
+      const formData = new FormData();
+      formData.append('id_usuario', String(idUsuario));
+      formData.append('foto', archivoFoto);
+
+      const resFoto = await api.put('/api/perfil/foto', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      if (resFoto.data?.fotoPerfil) {
+        nuevaFoto = resFoto.data.fotoPerfil;
+      }
+    }
+
+    // Actualizamos tanto la raíz como la propiedad .data para forzar re-render en React
+    updateUsuario({
+      ...usuario,
+      nombreC: nuevoNombreC,
+      fotoPerfil: nuevaFoto,
+      data: {
+        ...(usuario?.data || {}),
+        nombreC: nuevoNombreC,
+        fotoPerfil: nuevaFoto
+      }
+    });
+
+    onClose();
+  } catch (error: any) {
+    console.error('Error al actualizar el perfil:', error.response?.data || error.message);
+    alert(error.response?.data?.error || 'Hubo un problema al guardar los cambios.');
+  }
+};
 
   return (
     <div className="pu-modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
@@ -54,10 +117,7 @@ const EditModal: React.FC<EditModalProps> = ({ onClose }) => {
             <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFotoChange} />
           </div>
           <div className="pu-modal-field"><label>Nombre</label><input name="nombre" type="text" value={form.nombre} onChange={handleChange} placeholder="Tu nombre" /></div>
-          <div className="pu-modal-field"><label>Usuario</label><input name="usuario" type="text" value={form.usuario} onChange={handleChange} placeholder="@tuusuario" /></div>
-          <div className="pu-modal-field"><label>Mail</label><input name="email" type="email" value={form.email} onChange={handleChange} placeholder="correo@ejemplo.com" /></div>
           <div className="pu-modal-field"><label>Ubicación</label><input name="ubicacion" type="text" value={form.ubicacion} onChange={handleChange} placeholder="Ciudad, Provincia" /></div>
-          <div className="pu-modal-field"><label>¿Cuándo plantaste tu primer árbol?</label><input name="primerArbol" type="text" value={form.primerArbol} onChange={handleChange} placeholder="Ej: Marzo 2023" /></div>
           <div className="pu-modal-actions">
             <button type="button" className="pu-modal-btn-cancel" onClick={onClose}>Cancelar</button>
             <button type="submit" className="pu-modal-btn-save">Guardar cambios</button>
@@ -78,9 +138,14 @@ const PerfilUser: React.FC = () => {
 
   if (!usuario) return null;
 
-  const nombre = [usuario.nombre, usuario.apellido].filter(Boolean).join(' ');
-  const handle = usuario.usuario ? `@${usuario.usuario}` : `@${usuario.nombre.toLowerCase().replace(/\s/g, '')}`;
-  const desde = usuario.fechaUnion ?? 'Ruta Verde';
+  // Normalizamos el usuario para extraer los campos reales de la BD
+  const datos = usuario.data || usuario;
+
+  // Mapeo correcto de las columnas reales de Supabase
+  const nombre = datos.nombreC || datos.data?.nombreC || 'Usuario Ruta Verde';
+  const email = datos.email || '';
+  const fotoPerfil = datos.fotoPerfil || datos.data?.fotoPerfil || usuario.fotoPerfil || '';
+  const ubicacion = datos.ubicacion || '';
 
   const handleNoticiaClick = (noti: Noticia) => {
     setNoticiaAbierta(noti);
@@ -93,35 +158,39 @@ const PerfilUser: React.FC = () => {
 
   return (
     <div className="pu-page">
-
       {/* Banner verde */}
       <div className="pu-banner" />
 
       <div className="pu-body">
         {/* Avatar + botón editar */}
         <div className="pu-top-row">
-          <div className="pu-avatar-wrap">
-            {usuario.fotoPerfil ? (
-              <img src={usuario.fotoPerfil} alt={nombre} className="pu-avatar-img" />
-            ) : (
-              <div className="pu-avatar-placeholder">
-                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
-                </svg>
-              </div>
-            )}
-          </div>
+         <div className="pu-avatar-wrap">
+  {fotoPerfil ? (
+    <img 
+      src={fotoPerfil} 
+      alt={nombre} 
+      className="pu-avatar-img"
+      onError={(e) => console.error("Error al cargar la imagen con la URL:", fotoPerfil)} 
+    />
+  ) : (
+    <div className="pu-avatar-placeholder">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
+      </svg>
+    </div>
+  )}
+</div>
           <button className="pu-btn-editar" onClick={() => setModalPerfil(true)}>
             Editar Perfil
           </button>
         </div>
 
-        {/* Info */}
+        {/* Info Dinámica desde la BD */}
         <h1 className="pu-nombre">{nombre}</h1>
-        {usuario.descripcion && <p className="pu-descripcion">{usuario.descripcion}</p>}
+        {datos.descripcion && <p className="pu-descripcion">{datos.descripcion}</p>}
         <div className="pu-meta">
-          {usuario.ubicacion && <span className="pu-meta-item">📍 {usuario.ubicacion}</span>}
-          {usuario.email && <span className="pu-meta-item">✉️ {usuario.email}</span>}
+          {ubicacion && <span className="pu-meta-item">📍 {ubicacion}</span>}
+          {email && <span className="pu-meta-item">✉️ {email}</span>}
         </div>
 
         {/* ── Subir noticia ── */}
