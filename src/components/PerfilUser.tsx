@@ -38,66 +38,74 @@ const EditModal: React.FC<EditModalProps> = ({ onClose }) => {
     reader.readAsDataURL(file);
   };
 
-const handleGuardar = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleGuardar = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  try {
-    const idUsuario = datosUsuario?.id_usuario || datosUsuario?.id;
+    try {
+      const idUsuario = datosUsuario?.id_usuario || datosUsuario?.id;
 
-    if (!idUsuario) {
-      alert('Error: No se encontró la sesión del usuario.');
-      return;
-    }
-
-    let nuevoNombreC = datosUsuario?.nombreC || datosUsuario?.nombre;
-    let nuevaFoto = datosUsuario?.fotoPerfil;
-
-    const nombreForm = form.nombre.trim();
-    const nombreActual = (datosUsuario?.nombreC || datosUsuario?.nombre || '').trim();
-
-    if (nombreForm && nombreForm !== nombreActual) {
-      const resNombre = await api.put('/api/perfil/nombre', {
-        id_usuario: Number(idUsuario),
-        nombre: nombreForm
-      });
-
-      if (resNombre.data?.nombre) {
-        nuevoNombreC = resNombre.data.nombre;
+      if (!idUsuario) {
+        alert('Error: No se encontró la sesión del usuario.');
+        return;
       }
-    }
 
-    if (archivoFoto) {
-      const formData = new FormData();
-      formData.append('id_usuario', String(idUsuario));
-      formData.append('foto', archivoFoto);
+      let nuevoNombreC = datosUsuario?.nombreC || datosUsuario?.nombre;
+      let nuevaFoto = datosUsuario?.fotoPerfil;
 
-      const resFoto = await api.put('/api/perfil/foto', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const nombreForm = form.nombre.trim();
+      const nombreActual = (datosUsuario?.nombreC || datosUsuario?.nombre || '').trim();
 
-      if (resFoto.data?.fotoPerfil) {
-        nuevaFoto = resFoto.data.fotoPerfil;
+      if (nombreForm && nombreForm !== nombreActual) {
+        const resNombre = await api.put('/api/perfil/nombre', {
+          id_usuario: Number(idUsuario),
+          nombre: nombreForm
+        });
+
+        if (resNombre.data?.nombre) {
+          nuevoNombreC = resNombre.data.nombre;
+        }
       }
-    }
 
-    // Actualizamos tanto la raíz como la propiedad .data para forzar re-render en React
-    updateUsuario({
-      ...usuario,
-      nombreC: nuevoNombreC,
-      fotoPerfil: nuevaFoto,
-      data: {
-        ...(usuario?.data || {}),
+      if (archivoFoto) {
+        const formData = new FormData();
+
+        // PRIMERO agregamos el id_usuario
+        formData.append('id_usuario', String(idUsuario));
+
+        // DESPUÉS agregamos la imagen
+        formData.append('foto', archivoFoto);
+
+        const resFoto = await api.put('/api/perfil/foto', formData);
+
+        if (resFoto.data?.fotoPerfil) {
+          nuevaFoto = resFoto.data.fotoPerfil;
+        }
+      }
+
+      // 1. Armamos el objeto con los datos actualizados
+      const usuarioActualizado = {
+        ...usuario,
         nombreC: nuevoNombreC,
-        fotoPerfil: nuevaFoto
-      }
-    });
+        fotoPerfil: nuevaFoto,
+        data: {
+          ...(usuario?.data || {}),
+          nombreC: nuevoNombreC,
+          fotoPerfil: nuevaFoto
+        }
+      };
 
-    onClose();
-  } catch (error: any) {
-    console.error('Error al actualizar el perfil:', error.response?.data || error.message);
-    alert(error.response?.data?.error || 'Hubo un problema al guardar los cambios.');
-  }
-};
+      // 2. Guardamos en el localStorage para que persista al recargar la página (F5)
+      localStorage.setItem('usuario', JSON.stringify(usuarioActualizado));
+
+      // 3. Actualizamos el estado global en React
+      updateUsuario(usuarioActualizado);
+
+      onClose();
+    } catch (error: any) {
+      console.error('Error al actualizar el perfil:', error.response?.data || error.message);
+      alert(error.response?.data?.error || 'Hubo un problema al guardar los cambios.');
+    }
+  };
 
   return (
     <div className="pu-modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
@@ -164,22 +172,22 @@ const PerfilUser: React.FC = () => {
       <div className="pu-body">
         {/* Avatar + botón editar */}
         <div className="pu-top-row">
-         <div className="pu-avatar-wrap">
-  {fotoPerfil ? (
-    <img 
-      src={fotoPerfil} 
-      alt={nombre} 
-      className="pu-avatar-img"
-      onError={(e) => console.error("Error al cargar la imagen con la URL:", fotoPerfil)} 
-    />
-  ) : (
-    <div className="pu-avatar-placeholder">
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
-      </svg>
-    </div>
-  )}
-</div>
+          <div className="pu-avatar-wrap">
+            {fotoPerfil ? (
+              <img
+                src={fotoPerfil}
+                alt={nombre}
+                className="pu-avatar-img"
+                onError={(e) => console.error("Error al cargar la imagen con la URL:", fotoPerfil)}
+              />
+            ) : (
+              <div className="pu-avatar-placeholder">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
+                </svg>
+              </div>
+            )}
+          </div>
           <button className="pu-btn-editar" onClick={() => setModalPerfil(true)}>
             Editar Perfil
           </button>
