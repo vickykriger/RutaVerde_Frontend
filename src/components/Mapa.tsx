@@ -17,7 +17,11 @@ const FitBoundsHelper = ({ geoJsonData }: { geoJsonData: any }) => {
   useEffect(() => {
     if (geoJsonData) {
       const layer = L.geoJSON(geoJsonData);
-      map.fitBounds(layer.getBounds());
+      const bounds = layer.getBounds();
+      // Validamos que los límites existan antes de llamar a fitBounds
+      if (bounds.isValid()) {
+        map.fitBounds(bounds);
+      }
     }
   }, [geoJsonData, map]);
 
@@ -34,14 +38,14 @@ const MapaComponente: React.FC<MapaProps> = ({ onSeleccionarRegion }) => {
   useEffect(() => {
     const cargarYCombinarDatos = async () => {
       try {
-        // 1. Cargar las ecorregiones con las contribuciones procesadas desde data/ecorregiones.ts
+        // 1. Cargar las ecorregiones
         const listaEcorregiones = await obtenerEcorregiones();
 
         // 2. Cargar el GeoJSON de geometrías desde la API
         const respuestaGeoJson = await api.get('/api/ecorregiones');
         const rawGeoJson = respuestaGeoJson.data;
 
-        // 3. Fusionar la propiedad 'contribuciones' en feature.properties de cada polígono
+        // 3. Fusionar la propiedad 'contribuciones' en feature.properties
         if (rawGeoJson && rawGeoJson.features) {
           const geoJsonEnriquecido = {
             ...rawGeoJson,
@@ -49,8 +53,9 @@ const MapaComponente: React.FC<MapaProps> = ({ onSeleccionarRegion }) => {
               const props = feature.properties || {};
               const nombreMapa = props.NOMBRE || props.ECO_NAME || props.nombre || '';
 
+              // Encadenamiento opcional (?.) y fallback '' para evitar el error 'toLowerCase' de undefined
               const regionDb = listaEcorregiones.find(
-                (item) => item.nombre.toLowerCase().trim() === nombreMapa.toLowerCase().trim()
+                (item) => (item?.nombre || '').toLowerCase().trim() === nombreMapa.toLowerCase().trim()
               );
 
               return {
@@ -134,8 +139,10 @@ const MapaComponente: React.FC<MapaProps> = ({ onSeleccionarRegion }) => {
         worldCopyJump={true} 
         style={{ height: '100%', width: '100%' }}
       >
+        {/* Usamos subdominios {s} para solucionar los errores ERR_HTTP2_PROTOCOL_ERROR */}
         <TileLayer
-          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          subdomains={['a', 'b', 'c']}
           maxZoom={19}
           attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         />

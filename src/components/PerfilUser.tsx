@@ -42,7 +42,10 @@ const EditModal: React.FC<EditModalProps> = ({ onClose }) => {
     e.preventDefault();
 
     try {
-      const idUsuario = datosUsuario?.id_usuario || datosUsuario?.id;
+      // 1. Obtenemos el ID de usuario desde AuthContext o localStorage
+      const usuarioGuardado = JSON.parse(localStorage.getItem('usuario') || '{}');
+      const datosStorage = usuarioGuardado.data || usuarioGuardado;
+      const idUsuario = datosUsuario?.id_usuario || datosUsuario?.id || datosStorage?.id_usuario || datosStorage?.id;
 
       if (!idUsuario) {
         alert('Error: No se encontró la sesión del usuario.');
@@ -55,34 +58,37 @@ const EditModal: React.FC<EditModalProps> = ({ onClose }) => {
       const nombreForm = form.nombre.trim();
       const nombreActual = (datosUsuario?.nombreC || datosUsuario?.nombre || '').trim();
 
+      // 2. Si el nombre cambió, realizamos la petición enviando idUsuario
       if (nombreForm && nombreForm !== nombreActual) {
         const resNombre = await api.put('/api/perfil/nombre', {
-          id_usuario: Number(idUsuario),
+          idUsuario: Number(idUsuario), // Enviamos 'idUsuario' coincidiendo con el backend
           nombre: nombreForm
         });
 
-        if (resNombre.data?.nombre) {
-          nuevoNombreC = resNombre.data.nombre;
+        if (resNombre.data?.data?.nombreC || resNombre.data?.nombre) {
+          nuevoNombreC = resNombre.data?.data?.nombreC || resNombre.data?.nombre || nombreForm;
+        } else {
+          nuevoNombreC = nombreForm;
         }
       }
 
       if (archivoFoto) {
         const formData = new FormData();
-
-        // PRIMERO agregamos el id_usuario
         formData.append('id_usuario', String(idUsuario));
-
-        // DESPUÉS agregamos la imagen
         formData.append('foto', archivoFoto);
 
-        const resFoto = await api.put('/api/perfil/foto', formData);
+        const resFoto = await api.put('/api/perfil/foto', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
 
         if (resFoto.data?.fotoPerfil) {
           nuevaFoto = resFoto.data.fotoPerfil;
         }
       }
 
-      // 1. Armamos el objeto con los datos actualizados
+      // 3. Armamos el objeto con los datos actualizados
       const usuarioActualizado = {
         ...usuario,
         nombreC: nuevoNombreC,
@@ -94,10 +100,8 @@ const EditModal: React.FC<EditModalProps> = ({ onClose }) => {
         }
       };
 
-      // 2. Guardamos en el localStorage para que persista al recargar la página (F5)
+      // 4. Guardamos en localStorage y actualizamos el estado global
       localStorage.setItem('usuario', JSON.stringify(usuarioActualizado));
-
-      // 3. Actualizamos el estado global en React
       updateUsuario(usuarioActualizado);
 
       onClose();
@@ -146,10 +150,8 @@ const PerfilUser: React.FC = () => {
 
   if (!usuario) return null;
 
-  // Normalizamos el usuario para extraer los campos reales de la BD
   const datos = usuario.data || usuario;
 
-  // Mapeo correcto de las columnas reales de Supabase
   const nombre = datos.nombreC || datos.data?.nombreC || 'Usuario Ruta Verde';
   const email = datos.email || '';
   const fotoPerfil = datos.fotoPerfil || datos.data?.fotoPerfil || usuario.fotoPerfil || '';
@@ -166,11 +168,9 @@ const PerfilUser: React.FC = () => {
 
   return (
     <div className="pu-page">
-      {/* Banner verde */}
       <div className="pu-banner" />
 
       <div className="pu-body">
-        {/* Avatar + botón editar */}
         <div className="pu-top-row">
           <div className="pu-avatar-wrap">
             {fotoPerfil ? (
@@ -193,7 +193,6 @@ const PerfilUser: React.FC = () => {
           </button>
         </div>
 
-        {/* Info Dinámica desde la BD */}
         <h1 className="pu-nombre">{nombre}</h1>
         {datos.descripcion && <p className="pu-descripcion">{datos.descripcion}</p>}
         <div className="pu-meta">
@@ -201,7 +200,6 @@ const PerfilUser: React.FC = () => {
           {email && <span className="pu-meta-item">✉️ {email}</span>}
         </div>
 
-        {/* ── Subir noticia ── */}
         <div className="pu-section-noticia">
           <div className="pu-section-noticia-header">
             <div>
@@ -212,7 +210,6 @@ const PerfilUser: React.FC = () => {
           </div>
         </div>
 
-        {/* ── Noticias recomendadas ── */}
         <div className="pu-section-recomendadas">
           <h2 className="pu-section-title">Noticias recomendadas</h2>
           <div className="pu-noticias-grid">
@@ -232,12 +229,10 @@ const PerfilUser: React.FC = () => {
         </div>
       </div>
 
-      {/* Modales */}
       {modalPerfil && <EditModal onClose={() => setModalPerfil(false)} />}
       {modalNoticia && <SubirNoticiaModal onClose={() => setModalNoticia(false)} />}
       {noticiaAbierta && <NoticiaModal noticia={noticiaAbierta} onClose={handleNoticiaClose} />}
 
-      {/* Cerrar sesión */}
       <div className="pu-logout-wrap">
         <button className="pu-btn-logout" onClick={logout}>Cerrar sesión</button>
       </div>

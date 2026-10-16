@@ -1,3 +1,4 @@
+import axios from 'axios';
 export interface Ecorregion {
   id: number;
   nombre: string;
@@ -7,26 +8,24 @@ export interface Ecorregion {
   contribuciones: number;
 }
 
-export async function obtenerEcorregiones(): Promise<Ecorregion[]> {
+export const obtenerEcorregiones = async () => {
   try {
-    const response = await fetch('http://localhost:5000/api/ecoregiones');
+    // 1. Usamos la URL con una o dos 'r' según tu backend
+    const res = await axios.get('http://localhost:5000/api/ecorregiones');
     
-    if (!response.ok) {
-      throw new Error(`Error en la petición: ${response.statusText}`);
+    // 2. Si el backend devuelve un objeto GeoJSON, extraemos el array 'features'
+    //    Si devuelve un array directo, usamos res.data
+    const datos = res.data;
+    
+    if (Array.isArray(datos)) {
+      return datos;
+    } else if (datos && Array.isArray(datos.features)) {
+      return datos.features; // Extrae el array de características del GeoJSON
     }
-
-    const data = await response.json();
-
-    return data.map((item: any, index: number) => ({
-      id: item.id || item.id_region || index + 1,
-      nombre: item.nombre || '',
-      paises: item.paises || 'América Latina',
-      resumen: item.resumen || item.descripcion || 'Sin descripción disponible.',
-      bioma: item.bioma || 'Ecorregión',
-      contribuciones: item.contribuciones || 0
-    }));
+    
+    return []; // Retorna array vacío para evitar que .map rompa la interfaz
   } catch (error) {
-    console.error('❌ Error al conectar con /api/ecoregiones:', error);
+    console.error("Error al obtener ecorregiones:", error);
     return [];
   }
-}
+};
