@@ -7,9 +7,10 @@ interface SubirNoticiaModalProps {
 const SubirNoticiaModal: React.FC<SubirNoticiaModalProps> = ({ onClose }) => {
   const fotoInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({ titulo: '', contenido: '', foto: '' });
-  const [archivoFoto, setArchivoFoto] = useState<File | null>(null); // Pasa el archivo binario al backend
+  const [archivoFoto, setArchivoFoto] = useState<File | null>(null);
   const [enviado, setEnviado] = useState(false);
   const [cargando, setCargando] = useState(false);
+  const [cargandoIA, setCargandoIA] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -18,11 +19,51 @@ const SubirNoticiaModal: React.FC<SubirNoticiaModalProps> = ({ onClose }) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setArchivoFoto(file); // Guarda el archivo para Multer
+    setArchivoFoto(file);
 
     const reader = new FileReader();
     reader.onloadend = () => setForm(prev => ({ ...prev, foto: reader.result as string }));
     reader.readAsDataURL(file);
+  };
+
+  // Función para enviar el borrador al backend y refinarlo con Gemini
+  const handleMejorarConIA = async () => {
+    if (!form.contenido.trim()) {
+      alert('Por favor escribí al menos una idea en el campo de contenido para poder mejoarla con IA.');
+      return;
+    }
+
+    try {
+      setCargandoIA(true);
+
+      const res = await fetch('http://127.0.0.1:5000/api/Noticias/mejorar-ia', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          titulo: form.titulo,
+          descripcion: form.contenido, // Se envía 'contenido' mapeado a 'descripcion'
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.data) {
+        setForm(prev => ({
+          ...prev,
+          titulo: data.data.titulo || prev.titulo,
+          contenido: data.data.descripcion || prev.contenido,
+        }));
+      } else {
+        alert('Error al procesar con IA: ' + (data.error || 'Verificá el backend'));
+      }
+    } catch (err) {
+      console.error('Error en la llamada de IA:', err);
+      alert('No se pudo conectar con el servidor de IA.');
+    } finally {
+      setCargandoIA(false);
+    }
   };
 
   const handlePublicar = async (e: React.FormEvent) => {
@@ -41,7 +82,6 @@ const SubirNoticiaModal: React.FC<SubirNoticiaModalProps> = ({ onClose }) => {
       formData.append('contenido', form.contenido);
       formData.append('foto', archivoFoto);
 
-      // Usa 127.0.0.1 para evitar bloqueos de IPv6/localhost
       const res = await fetch('http://127.0.0.1:5000/api/Noticias', {
         method: 'POST',
         body: formData,
@@ -105,12 +145,35 @@ const SubirNoticiaModal: React.FC<SubirNoticiaModalProps> = ({ onClose }) => {
             </div>
 
             <div className="pu-modal-field">
-              <label>Contenido</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <label style={{ margin: 0 }}>Contenido</label>
+                <button
+                  type="button"
+                  onClick={handleMejorarConIA}
+                  disabled={cargandoIA || cargando}
+                  style={{
+                    background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '4px 10px',
+                    cursor: (cargandoIA || cargando) ? 'not-allowed' : 'pointer',
+                    fontSize: '0.8rem',
+                    fontWeight: 'bold',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    opacity: cargandoIA ? 0.7 : 1
+                  }}
+                >
+                  {cargandoIA ? '✨ Mejorando...' : '✨ Mejorar con IA'}
+                </button>
+              </div>
               <textarea name="contenido" value={form.contenido} onChange={handleChange} placeholder="Escribí el contenido de tu noticia..." rows={7} required />
             </div>
 
             <div className="pu-publicar-wrap">
-              <button type="submit" className="pu-btn-publicar" disabled={cargando}>
+              <button type="submit" className="pu-btn-publicar" disabled={cargando || cargandoIA}>
                 {cargando ? 'Publicando...' : 'Publicar'}
               </button>
               <p className="pu-publicar-aviso">Una vez la noticia fue enviada, deberá ser aprobada por Ruta Verde para aparecer en el newsletter general.</p>
