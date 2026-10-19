@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import api from '../../api';
 import './SubirBaldosa.css';
 
@@ -6,65 +6,68 @@ interface SubirBaldosaProps {
   onRegisterClick?: () => void;
 }
 
-interface Planta {
-  id_planta: number;
-  nombre: string;
-}
-
 interface Region {
   id_region: number;
   nombre: string;
-  plantas?: Planta[];
 }
 
 const SubirBaldosa: React.FC<SubirBaldosaProps> = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [region, setRegion] = useState('');
-  const [listaRegiones, setListaRegiones] = useState<Region[]>([]);
-  
+  // Estados del formulario
   const [planta, setPlanta] = useState('');
-  const [plantasDisponibles, setPlantasDisponibles] = useState<Planta[]>([]);
+  const [region, setRegion] = useState('');
+  const [regionesFiltradas, setRegionesFiltradas] = useState<Region[]>([]);
+  const [cargandoRegiones, setCargandoRegiones] = useState(false);
 
   const [tamano, setTamano] = useState('');
   const [comentarios, setComentarios] = useState('');
   const [imagenArchivo, setImagenArchivo] = useState<File | null>(null);
   const [nombreImagen, setNombreImagen] = useState('Ningún archivo seleccionado');
 
-  useEffect(() => {
-    const cargarRegiones = async () => {
-      try {
-        const respuesta = await api.get('/api/regiones');
-        const datos = respuesta.data ?? respuesta;
+  // Buscar ecorregiones asociadas a la planta
+  const buscarRegionesPorPlanta = async (nombrePlanta: string) => {
+    if (!nombrePlanta.trim()) {
+      setRegionesFiltradas([]);
+      setRegion('');
+      return;
+    }
+
+    setCargandoRegiones(true);
+    try {
+      const respuesta = await api.get(`/api/regiones/por-planta?planta=${encodeURIComponent(nombrePlanta.trim())}`);
+      const datos = respuesta.data?.data || respuesta.data || [];
+
+      if (Array.isArray(datos)) {
+        setRegionesFiltradas(datos);
         
-        console.log('📌 Regiones y Plantas Nativas cargadas:', datos);
-
-        if (Array.isArray(datos)) {
-          setListaRegiones(datos);
+        // Si solo pertenece a 1 región, la selecciona automáticamente
+        if (datos.length === 1) {
+          setRegion(String(datos[0].id_region));
+        } else {
+          setRegion('');
         }
-      } catch (error: any) {
-        console.error('Error al pedir las regiones:', error.response?.data || error.message);
+      } else {
+        setRegionesFiltradas([]);
+        setRegion('');
       }
-    };
+    } catch (error: any) {
+      console.error('Error al pedir las regiones por planta:', error.response?.data || error.message);
+      setRegionesFiltradas([]);
+      setRegion('');
+    } finally {
+      setCargandoRegiones(false);
+    }
+  };
 
-    cargarRegiones();
-  }, []);
+  const handlePlantaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const valor = e.target.value;
+    setPlanta(valor);
+  };
 
-  const handleRegionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-  const regionIdSel = e.target.value;
-  setRegion(regionIdSel);
-  setPlanta(''); 
-
-  const regionEncontrada = listaRegiones.find(
-    (r: any) => String(r.id_region ?? r.id) === String(regionIdSel)
-  );
-  console.log("🔍 Región seleccionada:", regionEncontrada);
-  if (regionEncontrada && Array.isArray(regionEncontrada.plantas) && regionEncontrada.plantas.length > 0) {
-    setPlantasDisponibles(regionEncontrada.plantas);
-  } else {
-    setPlantasDisponibles([]);
-  }
-};
+  const handlePlantaBlur = () => {
+    buscarRegionesPorPlanta(planta);
+  };
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -88,7 +91,7 @@ const SubirBaldosa: React.FC<SubirBaldosaProps> = () => {
 
     try {
       const formData = new FormData();
-      formData.append('idPlanta', planta);
+      formData.append('nombrePlanta', planta);
       formData.append('idRegion', region);
       formData.append('tamanio', tamano);
       formData.append('comentarios', comentarios);
@@ -102,15 +105,15 @@ const SubirBaldosa: React.FC<SubirBaldosaProps> = () => {
         alert("¡Baldosa guardada con éxito!");
         setPlanta('');
         setRegion('');
+        setRegionesFiltradas([]);
         setTamano('');
         setComentarios('');
         setImagenArchivo(null);
         setNombreImagen('Ningún archivo seleccionado');
-        setPlantasDisponibles([]);
       }
     } catch (error: any) {
       console.error("Error al subir la baldosa:", error.response?.data?.error || error.message);
-      alert("Hubo un problema al subir la baldosa.");
+      alert(error.response?.data?.error || "Hubo un problema al subir la baldosa.");
     }
   };
 
@@ -124,17 +127,40 @@ const SubirBaldosa: React.FC<SubirBaldosaProps> = () => {
 
         <form className="login-form" onSubmit={manejarEnvio}>
           
-          {/* Desplegable de Regiones */}
+          {/* 1. Nombre de la Planta Nativa */}
           <div className="form-group">
-            <label htmlFor="region">Región</label>
+            <label htmlFor="planta">Planta Nativa</label>
+            <input
+              type="text"
+              id="planta"
+              value={planta}
+              onChange={handlePlantaChange}
+              onBlur={handlePlantaBlur}
+              placeholder="Ingresá el nombre de la planta (ej: Ceibo)"
+              required
+            />
+          </div>
+
+          {/* 2. Desplegable de Regiones Filtradas */}
+          <div className="form-group">
+            <label htmlFor="region">Ecorregión</label>
             <select 
               id="region" 
               value={region} 
-              onChange={handleRegionChange} 
+              onChange={(e) => setRegion(e.target.value)} 
+              disabled={!planta || cargandoRegiones || regionesFiltradas.length === 0}
               required
             >
-              <option value="" disabled>Seleccioná tu región</option>
-              {listaRegiones.map((reg) => (
+              <option value="" disabled>
+                {cargandoRegiones
+                  ? 'Buscando ecorregiones...'
+                  : !planta
+                  ? 'Escribí una planta para ver sus ecorregiones'
+                  : regionesFiltradas.length === 0
+                  ? 'Planta no encontrada en ninguna ecorregión'
+                  : 'Seleccioná la ecorregión'}
+              </option>
+              {regionesFiltradas.map((reg) => (
                 <option key={reg.id_region} value={reg.id_region}>
                   {reg.nombre}
                 </option>
@@ -142,32 +168,7 @@ const SubirBaldosa: React.FC<SubirBaldosaProps> = () => {
             </select>
           </div>
 
-          {/* Desplegable de Plantas Nativas */}
-          <div className="form-group">
-            <label htmlFor="planta">Planta</label>
-            <select 
-              id="planta" 
-              value={planta} 
-              onChange={(e) => setPlanta(e.target.value)} 
-              disabled={!region || plantasDisponibles.length === 0}
-              required
-            >
-              <option value="" disabled>
-                {!region 
-                  ? 'Primero seleccioná una región' 
-                  : plantasDisponibles.length === 0 
-                    ? 'No hay plantas disponibles para esta región' 
-                    : 'Seleccioná la planta'}
-              </option>
-              {plantasDisponibles.map((p) => (
-                <option key={p.id_planta} value={p.id_planta}>
-                  {p.nombre}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Tamaño */}
+          {/* 3. Tamaño */}
           <div className="form-group">
             <label htmlFor="tamano">Tamaño</label>
             <select id="tamano" value={tamano} onChange={(e) => setTamano(e.target.value)} required>
@@ -178,7 +179,7 @@ const SubirBaldosa: React.FC<SubirBaldosaProps> = () => {
             </select>
           </div>
 
-          {/* Comentarios e Imagen */}
+          {/* 4. Comentarios e Imagen */}
           <div className="form-group textarea-group">
             <label htmlFor="comentarios" className="sr-only">Comentarios</label>
             <div className="textarea-container">
