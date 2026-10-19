@@ -101,7 +101,7 @@ const SubirBaldosa: React.FC<SubirBaldosaProps> = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      if (respuesta.data?.success || respuesta.success) {
+      if (respuesta.status === 201 || respuesta.status === 200 || respuesta.data?.success) {
         alert("¡Baldosa guardada con éxito!");
         setPlanta('');
         setRegion('');
