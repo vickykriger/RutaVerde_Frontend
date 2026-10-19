@@ -3,6 +3,7 @@
   background-color: var(--green-dark);
   padding: 1.5rem 0;
   color: var(--text-footer);
+  position: relative;
 }
 
 .footer-container {
@@ -41,4 +42,22 @@
   .footer-container {
     width: 92%;
   }
+}
+
+.footer-admin-link {
+  position: absolute;
+  bottom: 0.6rem;
+  right: 1rem;
+  font-size: 0.65rem;
+  color: var(--text-footer);
+  text-decoration: none;
+  opacity: 0.25;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.3s;
+  letter-spacing: 0.05em;
+}
+
+.footer-admin-link:hover {
+  opacity: 0.7;
 }

@@ -11,6 +11,15 @@ const Footer: React.FC = () => {
           <p className="footer-copyright">© 2026 Ruta Verde</p>
         </div>
       </div>
+      <a
+        href="http://localhost:5174"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="footer-admin-link"
+        title="Backoffice"
+      >
+        admin
+      </a>
     </footer>
   );
 };
