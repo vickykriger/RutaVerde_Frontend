@@ -11,7 +11,7 @@ interface InicioFormProps {
 const InicioForm: React.FC<InicioFormProps> = ({ onRegisterClick }) => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  
+
   // Estados para Login
   const [email, setEmail] = useState('');
   const [contrasenia, setContrasenia] = useState('');
@@ -61,7 +61,6 @@ const InicioForm: React.FC<InicioFormProps> = ({ onRegisterClick }) => {
       if (respuesta.data?.requiereCodigo) {
         setPasoCodigo(true);
       } else {
-        // En caso de que el backend ingrese directo
         completarLogin(respuesta.data?.usuario ?? respuesta.data);
       }
     } catch (err: any) {
@@ -126,7 +125,7 @@ const InicioForm: React.FC<InicioFormProps> = ({ onRegisterClick }) => {
 
             <form className="login-form" onSubmit={manejarLogin}>
               {error && <p className="form-error-banner">{error}</p>}
-              
+
               <div className="form-group">
                 <label htmlFor="email">Correo electrónico</label>
                 <input

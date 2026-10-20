@@ -26,10 +26,9 @@ const SubirNoticiaModal: React.FC<SubirNoticiaModalProps> = ({ onClose }) => {
     reader.readAsDataURL(file);
   };
 
-  // Función para enviar el borrador al backend y refinarlo con Gemini
   const handleMejorarConIA = async () => {
     if (!form.contenido.trim()) {
-      alert('Por favor escribí al menos una idea en el campo de contenido para poder mejoarla con IA.');
+      alert('Por favor escribí al menos una idea en el campo de contenido para poder mejorarla con IA.');
       return;
     }
 
@@ -43,7 +42,7 @@ const SubirNoticiaModal: React.FC<SubirNoticiaModalProps> = ({ onClose }) => {
         },
         body: JSON.stringify({
           titulo: form.titulo,
-          descripcion: form.contenido, // Se envía 'contenido' mapeado a 'descripcion'
+          descripcion: form.contenido,
         }),
       });
 
@@ -60,7 +59,7 @@ const SubirNoticiaModal: React.FC<SubirNoticiaModalProps> = ({ onClose }) => {
       }
     } catch (err) {
       console.error('Error en la llamada de IA:', err);
-      alert('No se pudo conectar con el servidor de IA.');
+      alert('No se pudo conectar con el servidor.');
     } finally {
       setCargandoIA(false);
     }
@@ -77,9 +76,15 @@ const SubirNoticiaModal: React.FC<SubirNoticiaModalProps> = ({ onClose }) => {
     try {
       setCargando(true);
 
+      // Obtenemos el usuario guardado para enviar su ID
+      const usuarioGuardado = localStorage.getItem('usuario');
+      const usuario = usuarioGuardado ? JSON.parse(usuarioGuardado) : null;
+      const idUsuario = usuario?.id || usuario?.id_usuario || 1;
+
       const formData = new FormData();
       formData.append('titulo', form.titulo);
-      formData.append('contenido', form.contenido);
+      formData.append('cuerpo', form.contenido); // Backend requiere 'cuerpo'
+      formData.append('id_usuario', idUsuario);
       formData.append('foto', archivoFoto);
 
       const res = await fetch('http://127.0.0.1:5000/api/Noticias', {
