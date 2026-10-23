@@ -8,7 +8,7 @@ import './Mapa.css';
 
 const limitesVerticales = L.latLngBounds(
   L.latLng(-60, -180),
-  L.latLng(15, 180) 
+  L.latLng(85, 180) 
 );
 
 const FitBoundsHelper = ({ geoJsonData }: { geoJsonData: any }) => {
@@ -53,10 +53,13 @@ const MapaComponente: React.FC<MapaProps> = ({ onSeleccionarRegion }) => {
               const props = feature.properties || {};
               const nombreMapa = props.NOMBRE || props.ECO_NAME || props.nombre || '';
 
-              // Encadenamiento opcional (?.) y fallback '' para evitar el error 'toLowerCase' de undefined
-              const regionDb = listaEcorregiones.find(
-                (item) => (item?.nombre || '').toLowerCase().trim() === nombreMapa.toLowerCase().trim()
-              );
+              const idMapa = (props.ECO_ID || props.id || '').toString().trim();
+
+              const regionDb = listaEcorregiones.find((item) => {
+                const idItem = (item.id || '').toString().trim();
+                const nombreItem = (item.nombre || '').toLowerCase().trim();
+                return (idItem && idItem === idMapa) || (nombreItem && nombreItem === nombreMapa);
+              });
 
               return {
                 ...feature,
@@ -95,7 +98,7 @@ const MapaComponente: React.FC<MapaProps> = ({ onSeleccionarRegion }) => {
     if (contribuciones >= 3) return '#CCE5AA';
     if (contribuciones >= 2) return '#DCEDC4';
     if (contribuciones >= 1) return '#EAF4DC';
-    return '#F5FAF0';
+    return '#C8E6C9';
   };
 
   const estiloEcorregiones = (feature: any) => {

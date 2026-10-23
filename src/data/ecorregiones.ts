@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export interface Ecorregion {
-  id: number;
+  id: string | number;
   nombre: string;
   paises: string;
   resumen: string;
@@ -9,22 +9,39 @@ export interface Ecorregion {
   contribuciones: number;
 }
 
-export const obtenerEcorregiones = async () => {
+export const obtenerEcorregiones = async (): Promise<Ecorregion[]> => {
   try {
-    // 1. Usamos la URL con una o dos 'r' según tu backend
     const res = await axios.get('http://localhost:5000/api/ecorregiones');
-    
-    // 2. Si el backend devuelve un objeto GeoJSON, extraemos el array 'features'
-    //    Si devuelve un array directo, usamos res.data
     const datos = res.data;
-    
+
+    // Si viene como array plano de la BD o mock
     if (Array.isArray(datos)) {
-      return datos;
-    } else if (datos && Array.isArray(datos.features)) {
-      return datos.features; // Extrae el array de características del GeoJSON
-    }
+      return datos.map((item: any, index: number) => ({
+        id: item.id || item.ECO_ID || index,
+        nombre: item.nombre || item.NOMBRE || 'Ecorregión sin nombre',
+        paises: item.paises || item.COUNTRY || 'América Latina',
+        resumen: item.resumen || item.CORRIDOR || item.VEG || 'Sin descripción disponible.',
+        bioma: item.bioma || item.BIOME || 'Ecorregión',
+        contribuciones: item.contribuciones || item.arbolesPlantados || 0,
+      }));
+    } 
     
-    return []; // Retorna array vacío para evitar que .map rompa la interfaz
+    // Si viene en formato GeoJSON (FeatureCollection)
+    if (datos && Array.isArray(datos.features)) {
+      return datos.features.map((feature: any, index: number) => {
+        const props = feature.properties || {};
+        return {
+          id: props.ECO_ID || props.id || index,
+          nombre: props.NOMBRE || props.ECO_NAME || props.nombre || 'Ecorregión sin nombre',
+          paises: props.COUNTRY || props.paises || 'América Latina',
+          resumen: props.CORRIDOR || props.VEG || props.resumen || 'Sin descripción disponible.',
+          bioma: props.BIOME || props.bioma || 'Ecorregión',
+          contribuciones: props.contribuciones || props.arbolesPlantados || 0,
+        };
+      });
+    }
+
+    return [];
   } catch (error) {
     console.error("Error al obtener ecorregiones:", error);
     return [];
